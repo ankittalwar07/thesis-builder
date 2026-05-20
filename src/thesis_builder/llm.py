@@ -81,14 +81,20 @@ class TraceWriter:
     """Thread-safe JSONL writer for trace events.
 
     Trace path is mutable — the CLI rebinds it to outputs/<theme>/trace.jsonl
-    once the theme is known.
+    once the theme is known. The optional ``on_event`` callback receives every
+    event after it's written; the server uses it to push SSE updates.
     """
 
-    def __init__(self, path: str | Path | None = None) -> None:
+    def __init__(
+        self,
+        path: str | Path | None = None,
+        on_event: Any = None,
+    ) -> None:
         self._lock = Lock()
         self._path: Path | None = Path(path) if path else None
         self.total_cost_usd: float = 0.0
         self.tokens_by_tier: dict[str, int] = {"small": 0, "reasoning": 0, "quality": 0}
+        self.on_event = on_event  # callable(event: dict) -> None
 
     def set_path(self, path: str | Path) -> None:
         with self._lock:
@@ -96,7 +102,6 @@ class TraceWriter:
             self._path.parent.mkdir(parents=True, exist_ok=True)
 
     def write(self, event: dict[str, Any]) -> None:
-        # Track running counters even when no path is set yet (early init).
         if event.get("kind") == "llm":
             tier = event.get("tier")
             if tier in self.tokens_by_tier:
@@ -105,11 +110,17 @@ class TraceWriter:
                     + (event.get("completion_tokens") or 0)
                 )
             self.total_cost_usd += float(event.get("cost_usd") or 0.0)
-        if self._path is None:
-            return
-        with self._lock:
-            with open(self._path, "a") as f:
-                f.write(json.dumps(event, default=str) + "\n")
+        if self._path is not None:
+            with self._lock:
+                with open(self._path, "a") as f:
+                    f.write(json.dumps(event, default=str) + "\n")
+        cb = self.on_event
+        if cb is not None:
+            try:
+                cb(event)
+            except Exception:
+                # Callbacks must never break tracing.
+                pass
 
 
 # --- Budget guard -----------------------------------------------------------

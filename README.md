@@ -68,11 +68,31 @@ Budgets and prompt versions:
 
 ## Usage
 
+### CLI
+
 ```bash
 uv run thesis "AI infrastructure"
 ```
 
-Outputs land under `outputs/<slug>/`:
+### Web UI (with no-API demo mode)
+
+```bash
+uv run thesis-serve --demo          # demo mode, no API keys needed
+# then open http://127.0.0.1:8000/
+
+uv run thesis-serve --live          # uses .env keys for real runs
+```
+
+The UI shows the live pipeline (Researcher → Skeptic → Synthesizer), a
+streaming trace, the value-chain tree, the rendered memo, the Mermaid
+diagram, the top-5 picks, and a metrics panel (cost, tokens by tier,
+cache hit rate, cheap-tier share). Demo mode plays canned data for
+"AI infrastructure", "Robotics", and "Energy transition"; other themes
+get a generic placeholder.
+
+### Outputs
+
+CLI outputs land under `outputs/<slug>/`:
 
 ```
 outputs/ai_infrastructure/

@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>thesis-builder</title>
+  <link rel="stylesheet" href="/static/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <span class="logo">tb</span>
+      <span class="title">thesis-builder</span>
+      <span class="mode-badge" id="mode-badge">demo</span>
+    </div>
+    <div class="hint" id="config-hint"></div>
+  </header>
+
+  <main>
+    <section class="controls">
+      <input
+        type="text"
+        id="theme-input"
+        placeholder='e.g. "AI infrastructure", "Robotics", "Energy transition"'
+        autocomplete="off"
+      />
+      <button id="run-btn">Build thesis</button>
+      <div class="presets">
+        <span>presets:</span>
+        <button class="preset" data-theme="AI infrastructure">AI infrastructure</button>
+        <button class="preset" data-theme="Robotics">Robotics</button>
+        <button class="preset" data-theme="Energy transition">Energy transition</button>
+      </div>
+    </section>
+
+    <section class="pipeline">
+      <div class="stage" id="stage-researcher">
+        <div class="stage-label">Researcher</div>
+        <div class="stage-status">idle</div>
+        <div class="stage-meta" id="meta-researcher"></div>
+      </div>
+      <div class="arrow">→</div>
+      <div class="stage" id="stage-skeptic">
+        <div class="stage-label">Skeptic</div>
+        <div class="stage-status">idle</div>
+        <div class="stage-meta" id="meta-skeptic"></div>
+      </div>
+      <div class="arrow">→</div>
+      <div class="stage" id="stage-synthesizer">
+        <div class="stage-label">Synthesizer</div>
+        <div class="stage-status">idle</div>
+        <div class="stage-meta" id="meta-synthesizer"></div>
+      </div>
+    </section>
+
+    <section class="metrics" id="metrics">
+      <div><div class="m-label">cost</div><div class="m-val" id="m-cost">$0.0000</div></div>
+      <div><div class="m-label">small tokens</div><div class="m-val" id="m-small">0</div></div>
+      <div><div class="m-label">reasoning tokens</div><div class="m-val" id="m-reasoning">0</div></div>
+      <div><div class="m-label">quality tokens</div><div class="m-val" id="m-quality">0</div></div>
+      <div><div class="m-label">cheap-tier share</div><div class="m-val" id="m-cheap">—</div></div>
+      <div><div class="m-label">searches</div><div class="m-val" id="m-searches">0</div></div>
+      <div><div class="m-label">summaries</div><div class="m-val" id="m-summaries">0</div></div>
+      <div><div class="m-label">critiques</div><div class="m-val" id="m-critiques">0</div></div>
+    </section>
+
+    <section class="results" id="results">
+      <nav class="tabs">
+        <button class="tab active" data-tab="tree">Tree</button>
+        <button class="tab" data-tab="memo">Memo</button>
+        <button class="tab" data-tab="diagram">Diagram</button>
+        <button class="tab" data-tab="picks">Picks</button>
+        <button class="tab" data-tab="trace">Trace</button>
+        <button class="tab" data-tab="json">JSON</button>
+      </nav>
+
+      <div class="tab-panel active" id="tab-tree">
+        <div class="placeholder">Run a theme to see the value-chain tree.</div>
+      </div>
+      <div class="tab-panel" id="tab-memo">
+        <div class="placeholder">Memo will render here after the synthesizer completes.</div>
+      </div>
+      <div class="tab-panel" id="tab-diagram">
+        <div class="placeholder">Mermaid diagram will render here.</div>
+      </div>
+      <div class="tab-panel" id="tab-picks">
+        <div class="placeholder">Top investable picks will render here.</div>
+      </div>
+      <div class="tab-panel" id="tab-trace">
+        <ul id="trace-list" class="trace-list"></ul>
+      </div>
+      <div class="tab-panel" id="tab-json">
+        <pre id="json-out" class="json-out">{}</pre>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <span>
+      <strong>demo mode</strong> exercises the real Researcher → Skeptic → Synthesizer LangGraph
+      with stubbed LLM responses. Pre-canned themes: <em>AI infrastructure</em>,
+      <em>Robotics</em>, <em>Energy transition</em>. Other themes return a generic placeholder.
+    </span>
+  </footer>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
