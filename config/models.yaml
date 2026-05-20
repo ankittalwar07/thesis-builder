@@ -1,0 +1,55 @@
+# Model tier routing for thesis-builder.
+#
+# Each tier lists candidate models in priority order. The LLM client tries the
+# primary; on rate-limit / 5xx / auth errors it walks the `fallbacks` list. Keep
+# tier-quality short and expensive — it is only used for the final synthesis.
+#
+# Model identifiers follow LiteLLM's "<provider>/<model>" convention.
+# See https://docs.litellm.ai/docs/providers for the full list.
+
+tiers:
+  small:
+    # Web-result summarization, per-source extraction, dedup. High volume,
+    # latency-sensitive, must be cheap. Free tiers preferred.
+    primary: groq/llama-3.1-8b-instant
+    fallbacks:
+      - openrouter/meta-llama/llama-3.1-8b-instruct:free
+      - gemini/gemini-1.5-flash-8b
+      - together_ai/meta-llama/Llama-3.2-3B-Instruct-Turbo
+    max_tokens: 512
+    temperature: 0.2
+    timeout_s: 30
+
+  reasoning:
+    # Skeptic critiques, ranking, coverage scoring. Mid-cost, structured output.
+    primary: deepseek/deepseek-chat
+    fallbacks:
+      - groq/llama-3.3-70b-versatile
+      - openrouter/deepseek/deepseek-chat
+      - gemini/gemini-1.5-flash
+    max_tokens: 2048
+    temperature: 0.3
+    timeout_s: 60
+
+  quality:
+    # ONLY the final synthesis pass. Anthropic prompt caching is enabled on the
+    # system prompt for this tier (see llm.py).
+    primary: anthropic/claude-sonnet-4-5
+    fallbacks:
+      - openai/gpt-4o
+      - anthropic/claude-3-5-sonnet-latest
+    max_tokens: 4096
+    temperature: 0.4
+    timeout_s: 120
+    enable_prompt_cache: true
+
+# Token budgets enforced before each agent call in graph.py.
+budgets:
+  researcher_context_tokens: 60000
+  skeptic_context_tokens: 30000
+  synthesizer_context_tokens: 80000
+
+# Instructor retry policy for structured outputs.
+instructor:
+  max_retries: 3
+  escalate_to_quality_on_final_failure: true
