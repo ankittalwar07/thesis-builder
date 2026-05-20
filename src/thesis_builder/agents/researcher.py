@@ -26,6 +26,7 @@ from ..llm import LLMClient
 from ..schemas import (
     CoverageReport,
     Node,
+    NodeList,
     QueryPlan,
     ResearchBundle,
     SearchQuery,
@@ -264,14 +265,9 @@ class Researcher:
                 ),
             },
         ]
-        from pydantic import BaseModel, Field
-
-        class _NodeList(BaseModel):
-            nodes: list[Node] = Field(default_factory=list)
-
         try:
-            wrapped: _NodeList = self.llm.complete(
-                tier="reasoning", messages=msgs, response_model=_NodeList
+            wrapped: NodeList = self.llm.complete(
+                tier="reasoning", messages=msgs, response_model=NodeList
             )
             return wrapped.nodes
         except Exception as e:

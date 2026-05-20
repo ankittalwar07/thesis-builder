@@ -118,6 +118,55 @@ class ResearchBundle(BaseModel):
     draft_nodes: list[Node] = Field(default_factory=list)
 
 
+class NodeList(BaseModel):
+    """Wrapper used by Instructor when asking for a flat list of nodes."""
+
+    nodes: list[Node] = Field(default_factory=list)
+
+
+# --- Internal: skeptic ------------------------------------------------------
+
+
+CritiqueAngle = Literal["bottleneck_vs_commodity", "substitution_risk", "priced_in"]
+
+
+class Critique(BaseModel):
+    """One angle of attack on one node."""
+
+    node_name: str
+    angle: CritiqueAngle
+    verdict: Literal["weak", "mixed", "strong"]
+    argument: str
+    suggested_change: str = Field(
+        default="",
+        description="Concrete edit to the node: drop, demote confidence, add risk, etc.",
+    )
+
+
+class SkepticReport(BaseModel):
+    """Aggregate of per-node critiques. Feeds the synthesizer."""
+
+    theme: str
+    critiques: list[Critique]
+    headline_concerns: list[str] = Field(
+        default_factory=list,
+        description="Top-level concerns that should appear in the final memo.",
+    )
+
+
+# --- Internal: synthesizer output ------------------------------------------
+
+
+class FinalOutput(BaseModel):
+    """What the synthesizer produces: structured thesis + two text artifacts."""
+
+    thesis: Thesis
+    memo_md: str = Field(description="Full markdown memo, ready to write to memo.md.")
+    diagram_mmd: str = Field(
+        description="Mermaid graph source, ready to write to diagram.mmd."
+    )
+
+
 # --- Internal: trace --------------------------------------------------------
 
 

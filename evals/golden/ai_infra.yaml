@@ -1,0 +1,21 @@
+theme: AI infrastructure
+expected_layers:
+  - raw_inputs
+  - enabling
+  - integrators
+  - applications
+must_mention_any:
+  # We require any one of each cluster to appear by name in the final tree.
+  - cluster: gpus
+    options: [NVDA, AMD, TSM]
+  - cluster: memory
+    options: [Micron, MU, SK Hynix, Samsung]
+  - cluster: networking
+    options: [ANET, Arista, Broadcom, AVGO]
+  - cluster: power
+    options: [Vertiv, VRT, Eaton, ETN, Schneider]
+  - cluster: foundry
+    options: [TSM, TSMC, Samsung, Intel, INTC]
+min_nodes: 8
+min_unique_urls: 25
+min_skeptic_critiques: 3
