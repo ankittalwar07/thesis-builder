@@ -1,7 +1,7 @@
 """Pydantic schemas shared across agents.
 
 The public contract (Node, Thesis) is defined in the project brief. Internal
-schemas below it are intermediates used by individual agents — they are kept
+schemas below it are intermediates used by individual agents; they are kept
 in this file so structured-output retries via Instructor can import them
 without circular dependencies.
 """
@@ -165,6 +165,30 @@ class FinalOutput(BaseModel):
     diagram_mmd: str = Field(
         description="Mermaid graph source, ready to write to diagram.mmd."
     )
+
+
+# --- Eval: LLM-judge scores ------------------------------------------------
+#
+# Lives here (not in evals/) so lightweight tools such as
+# scripts/validate_thesis.py can import it without pulling in LiteLLM.
+
+
+class DimensionScore(BaseModel):
+    score: int = Field(ge=0, le=5)
+    justification: str
+
+
+class JudgeScores(BaseModel):
+    coverage: DimensionScore
+    specificity: DimensionScore
+    novelty: DimensionScore
+    actionability: DimensionScore
+
+    @property
+    def total(self) -> int:
+        return sum(
+            s.score for s in (self.coverage, self.specificity, self.novelty, self.actionability)
+        )
 
 
 # --- Internal: trace --------------------------------------------------------

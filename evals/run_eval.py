@@ -14,7 +14,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import re
 import sys
 from pathlib import Path
 from typing import Any
@@ -26,6 +25,7 @@ from rich.table import Table
 from thesis_builder.cli import _slug
 from thesis_builder.llm import LLMClient, TraceWriter
 from thesis_builder.graph import build_graph
+from thesis_builder.publish import check_requirements
 from thesis_builder.tools import CacheBundle, WebSearch
 
 from .judges import JudgeScores, judge
@@ -39,16 +39,23 @@ def _load_golden(path: Path) -> dict[str, Any]:
         return yaml.safe_load(f)
 
 
-def _build_one(theme: str, output_dir: Path, console: Console) -> dict[str, Path]:
+def _build_one(
+    theme: str, output_dir: Path, console: Console, demo: bool = False
+) -> dict[str, Path]:
     slug = _slug(theme)
     out = output_dir / slug
     out.mkdir(parents=True, exist_ok=True)
     trace = TraceWriter(out / "trace.jsonl")
-    llm = LLMClient(trace=trace)
-    cache = CacheBundle()
-    search = WebSearch(cache=cache, trace=trace)
-    graph = build_graph(llm=llm, search=search, cache=cache, console=console)
-    result = graph.invoke({"theme": theme})
+    if demo:
+        from thesis_builder.demo import run_demo
+
+        result = run_demo(theme, trace=trace, console=console)
+    else:
+        llm = LLMClient(trace=trace)
+        cache = CacheBundle()
+        search = WebSearch(cache=cache, trace=trace)
+        graph = build_graph(llm=llm, search=search, cache=cache, console=console)
+        result = graph.invoke({"theme": theme})
     final = result["final"]
     paths = {
         "thesis": out / "thesis.json",
@@ -76,37 +83,11 @@ def _build_one(theme: str, output_dir: Path, console: Console) -> dict[str, Path
 
 
 def _hard_checks(spec: dict[str, Any], out_dir: Path) -> tuple[bool, list[str]]:
-    failures: list[str] = []
     thesis = json.loads((out_dir / "thesis.json").read_text())
-    nodes = thesis.get("nodes", [])
-    if len(nodes) < spec.get("min_nodes", 0):
-        failures.append(f"only {len(nodes)} nodes (need ≥{spec['min_nodes']})")
-
-    layers_seen = {n.get("layer") for n in nodes}
-    for layer in spec.get("expected_layers", []):
-        if layer not in layers_seen:
-            failures.append(f"missing layer: {layer}")
-
-    blob = json.dumps(thesis).lower() + " " + (out_dir / "memo.md").read_text().lower()
-    for cluster in spec.get("must_mention_any", []):
-        hit = any(re.search(rf"\b{re.escape(opt.lower())}\b", blob) for opt in cluster["options"])
-        if not hit:
-            failures.append(f"no mention of any of {cluster['cluster']}: {cluster['options']}")
-
+    memo = (out_dir / "memo.md").read_text()
     meta_path = out_dir / "_eval_meta.json"
-    if meta_path.exists():
-        meta = json.loads(meta_path.read_text())
-        if meta.get("unique_urls", 0) < spec.get("min_unique_urls", 0):
-            failures.append(
-                f"only {meta['unique_urls']} unique URLs (need ≥{spec['min_unique_urls']})"
-            )
-        if meta.get("critiques", 0) < spec.get("min_skeptic_critiques", 0):
-            failures.append(
-                f"only {meta['critiques']} skeptic critiques "
-                f"(need ≥{spec['min_skeptic_critiques']})"
-            )
-
-    return len(failures) == 0, failures
+    meta = json.loads(meta_path.read_text()) if meta_path.exists() else None
+    return check_requirements(spec, thesis, memo, meta)
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -118,6 +99,12 @@ def main(argv: list[str] | None = None) -> int:
         help="Score whatever artifacts already exist in outputs/, do not rebuild.",
     )
     parser.add_argument("--min-per-dim", type=int, default=DEFAULT_MIN_PER_DIM)
+    parser.add_argument(
+        "--demo",
+        action="store_true",
+        help="Offline plumbing check: demo LLM + search for both build and judge "
+        "(no API keys; scores are canned, so this tests wiring, not quality).",
+    )
     parser.add_argument(
         "--themes", nargs="*", help="Subset of golden themes to run (by filename stem)."
     )
@@ -135,7 +122,12 @@ def main(argv: list[str] | None = None) -> int:
         console.print("[red]no golden themes selected[/red]")
         return 2
 
-    judge_llm = LLMClient(trace=TraceWriter())
+    if args.demo:
+        from thesis_builder.demo import DemoLLM
+
+        judge_llm: LLMClient = DemoLLM(theme="judge")
+    else:
+        judge_llm = LLMClient(trace=TraceWriter())
 
     table = Table(title="Eval results")
     table.add_column("theme")
@@ -154,7 +146,7 @@ def main(argv: list[str] | None = None) -> int:
         out_dir = output_dir / slug
         if not args.use_existing:
             console.print(f"[bold]Building {theme}…[/bold]")
-            _build_one(theme, output_dir, console)
+            _build_one(theme, output_dir, console, demo=args.demo)
         elif not (out_dir / "thesis.json").exists():
             console.print(f"[red]no prior artifacts for {theme}, skipping[/red]")
             any_fail = True

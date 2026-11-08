@@ -19,9 +19,7 @@ import asyncio
 import json
 import os
 import queue
-import re
 import threading
-import time
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
@@ -88,14 +86,12 @@ def _run_pipeline(run: Run) -> None:
     cache = CacheBundle(os.environ.get("THESIS_CACHE_DIR", ".diskcache_demo" if run.demo else ".diskcache"))
 
     if run.demo:
-        from .demo import DemoLLM, DemoSearch, demo_fetch_source
-        from . import tools as _tools_mod
+        from .demo import DemoLLM, DemoSearch, offline_fetch
 
-        # Patch the module-level fetch_source the researcher uses. The patch
-        # is process-wide, but since the demo only runs in this server it's
-        # fine — and we restore the original on completion.
-        _orig_fetch = _tools_mod.fetch_source
-        _tools_mod.fetch_source = demo_fetch_source  # type: ignore[assignment]
+        # Swap fetch_source for canned snippets (process-wide while the run
+        # lasts; restored in the finally block below).
+        fetch_patch = offline_fetch()
+        fetch_patch.__enter__()
 
         llm: LLMClient = DemoLLM(theme=run.theme, trace=trace)
         search: Any = DemoSearch(theme=run.theme, trace=trace)
@@ -108,8 +104,7 @@ def _run_pipeline(run: Run) -> None:
             run.completed.set()
             return
         search = WebSearch(cache=cache, trace=trace)
-        _tools_mod = None
-        _orig_fetch = None
+        fetch_patch = None
 
     try:
         run.events.put({"type": "stage", "stage": "researcher", "status": "started"})
@@ -161,8 +156,8 @@ def _run_pipeline(run: Run) -> None:
         run.error = f"{type(e).__name__}: {e}"
         run.events.put({"type": "error", "note": run.error})
     finally:
-        if _orig_fetch is not None and _tools_mod is not None:
-            _tools_mod.fetch_source = _orig_fetch  # type: ignore[assignment]
+        if fetch_patch is not None:
+            fetch_patch.__exit__(None, None, None)
         run.completed.set()
 
 

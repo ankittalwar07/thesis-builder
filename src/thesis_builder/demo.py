@@ -14,9 +14,10 @@ from __future__ import annotations
 import random
 import re
 import time
+from contextlib import contextmanager
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
-from typing import Any
+from typing import Any, Iterator
 
 from pydantic import BaseModel
 
@@ -446,7 +447,7 @@ def _generic_pack(theme: str) -> _ThemePack:
         "skeptic, and synthesizer agents — only the LLM calls and search results were stubbed. "
         "To produce a real thesis, set API keys and run without the --demo flag."
     )
-    diagram = f"""graph LR
+    diagram = """graph LR
   subgraph raw[Raw inputs]
     r1["Raw inputs<br/>DEMO"]
   end
@@ -805,3 +806,44 @@ def _build_memo(pack: _ThemePack, nodes: list[Node]) -> str:
     for u in urls:
         sections.append(f"- {u}")
     return "\n".join(sections)
+
+
+# --- Wiring helpers ---------------------------------------------------------
+
+
+@contextmanager
+def offline_fetch() -> Iterator[None]:
+    """Route every ``fetch_source`` call to the canned demo snippets.
+
+    The researcher imports ``fetch_source`` by name, so patching only
+    ``tools.fetch_source`` is not enough; both bindings are swapped here and
+    restored on exit. Guarantees demo runs make no network requests.
+    """
+    from . import tools as _tools
+    from .agents import researcher as _researcher
+
+    orig_tools, orig_researcher = _tools.fetch_source, _researcher.fetch_source
+    _tools.fetch_source = demo_fetch_source  # type: ignore[assignment]
+    _researcher.fetch_source = demo_fetch_source  # type: ignore[assignment]
+    try:
+        yield
+    finally:
+        _tools.fetch_source = orig_tools  # type: ignore[assignment]
+        _researcher.fetch_source = orig_researcher  # type: ignore[assignment]
+
+
+def run_demo(theme: str, trace: TraceWriter | None = None, cache_dir: str = ".diskcache_demo",
+             seed: int | None = None, console: Any = None) -> dict[str, Any]:
+    """Run the real LangGraph pipeline with stubbed LLM + search. No keys, no network."""
+    from .graph import build_graph
+    from .tools import CacheBundle
+
+    if seed is not None:
+        random.seed(seed)
+    trace = trace or TraceWriter()
+    llm = DemoLLM(theme=theme, trace=trace)
+    search = DemoSearch(theme=theme, trace=trace)
+    cache = CacheBundle(cache_dir)
+    with offline_fetch():
+        graph = build_graph(llm=llm, search=search, cache=cache, console=console)
+        return graph.invoke({"theme": theme})

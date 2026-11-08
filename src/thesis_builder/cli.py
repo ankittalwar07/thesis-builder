@@ -8,7 +8,7 @@ diagram.mmd; prints a summary table.
 from __future__ import annotations
 
 import argparse
-import json
+import contextlib
 import os
 import re
 import sys
@@ -64,6 +64,17 @@ def main(argv: list[str] | None = None) -> int:
         default=None,
         help="Hard cost cap in USD (default: THESIS_MAX_COST_USD env or unlimited)",
     )
+    parser.add_argument(
+        "--demo",
+        action="store_true",
+        help="Run the real graph with stubbed LLM + search (no API keys, no network).",
+    )
+    parser.add_argument(
+        "--publish-dir",
+        default=None,
+        help="Also write the GitHub Pages JSON (themes/<slug>.json + index.json) here, "
+        "e.g. docs/data",
+    )
     args = parser.parse_args(argv)
 
     console = Console()
@@ -76,31 +87,45 @@ def main(argv: list[str] | None = None) -> int:
     trace_path.write_text("")
 
     trace = TraceWriter(trace_path)
-    try:
-        llm = LLMClient(
-            config_path=args.config, trace=trace, max_cost_usd=args.max_cost
-        )
-    except FileNotFoundError as e:
-        console.print(f"[red]config not found: {e}[/red]")
-        return 2
+    if args.demo:
+        from .demo import DemoLLM, DemoSearch, offline_fetch
 
-    cache = CacheBundle(args.cache_dir)
-    search = WebSearch(cache=cache, trace=trace)
+        llm: LLMClient = DemoLLM(theme=args.theme, trace=trace)
+        search = DemoSearch(theme=args.theme, trace=trace)
+        cache_dir = ".diskcache_demo"
+        cache = CacheBundle(cache_dir)
+        fetch_ctx = offline_fetch()
+    else:
+        try:
+            llm = LLMClient(
+                config_path=args.config, trace=trace, max_cost_usd=args.max_cost
+            )
+        except FileNotFoundError as e:
+            console.print(f"[red]config not found: {e}[/red]")
+            return 2
+        cache_dir = args.cache_dir
+        cache = CacheBundle(cache_dir)
+        search = WebSearch(cache=cache, trace=trace)
+        fetch_ctx = contextlib.nullcontext()
 
+    mode = "demo (stubbed LLM + search, no API calls)" if args.demo else "live (LiteLLM)"
+    cap = llm.max_cost_usd if llm.max_cost_usd is not None else "unlimited"
     console.print(
         Panel.fit(
             f"[bold]Building thesis for:[/bold] {args.theme}\n"
-            f"[dim]output: {out_dir}\n"
-            f"cache: {args.cache_dir}\n"
-            f"cost cap: ${llm.max_cost_usd if llm.max_cost_usd is not None else 'unlimited'}[/dim]",
+            f"[dim]mode: {mode}\n"
+            f"output: {out_dir}\n"
+            f"cache: {cache_dir}\n"
+            f"cost cap: ${cap}[/dim]",
             title="thesis-builder",
         )
     )
 
-    graph = build_graph(llm=llm, search=search, cache=cache, console=console)
     t0 = time.perf_counter()
     try:
-        result = graph.invoke({"theme": args.theme})
+        with fetch_ctx:
+            graph = build_graph(llm=llm, search=search, cache=cache, console=console)
+            result = graph.invoke({"theme": args.theme})
     except BudgetExceeded as e:
         console.print(f"[red]cost cap hit before completion: {e}[/red]")
         return 3
@@ -143,7 +168,10 @@ def main(argv: list[str] | None = None) -> int:
     if skeptic is not None:
         table.add_row("skeptic critiques", str(len(skeptic.critiques)))
     table.add_row("cache hit rate", f"{cache.hit_rate():.0%}")
-    table.add_row("total cost (USD)", f"${trace.total_cost_usd:.4f}")
+    table.add_row(
+        "total cost (USD, simulated)" if args.demo else "total cost (USD)",
+        f"${trace.total_cost_usd:.4f}",
+    )
     total_tokens = sum(trace.tokens_by_tier.values())
     cheap = trace.tokens_by_tier["small"] + trace.tokens_by_tier["reasoning"]
     cheap_ratio = (cheap / total_tokens) if total_tokens else 0.0
@@ -160,6 +188,19 @@ def main(argv: list[str] | None = None) -> int:
     console.print(f"  {memo_path}")
     console.print(f"  {diagram_path}")
     console.print(f"  {trace_path}")
+
+    if args.publish_dir:
+        from . import publish
+
+        pub = publish.from_pipeline(
+            result,
+            generated_by="demo" if args.demo else "litellm-pipeline",
+            sample=args.demo,
+        )
+        path = publish.write_published(pub, args.publish_dir)
+        index = publish.build_index(args.publish_dir)
+        (Path(args.publish_dir) / "index.json").write_text(index.model_dump_json(indent=2) + "\n")
+        console.print(f"  {path}  [dim](published for the Pages UI)[/dim]")
     return 0
 
 

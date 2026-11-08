@@ -6,34 +6,17 @@ Four dimensions per the brief:
   - novelty:        is there at least one non-obvious thread vs. the consensus?
   - actionability:  are the investable picks ranked and defensible?
 
-Each dimension is scored 0–5 by tier-reasoning. The judge sees only the
-final thesis JSON + memo — never the research summaries — so it cannot just
+Each dimension is scored 0 to 5 by tier-reasoning. The judge sees only the
+final thesis JSON + memo, never the research summaries, so it cannot just
 re-summarize the inputs.
 """
 
 from __future__ import annotations
 
-from pydantic import BaseModel, Field
-
 from thesis_builder.llm import LLMClient
+from thesis_builder.schemas import DimensionScore, JudgeScores
 
-
-class DimensionScore(BaseModel):
-    score: int = Field(ge=0, le=5)
-    justification: str
-
-
-class JudgeScores(BaseModel):
-    coverage: DimensionScore
-    specificity: DimensionScore
-    novelty: DimensionScore
-    actionability: DimensionScore
-
-    @property
-    def total(self) -> int:
-        return sum(
-            s.score for s in (self.coverage, self.specificity, self.novelty, self.actionability)
-        )
+__all__ = ["DimensionScore", "JudgeScores", "JUDGE_SYSTEM", "JUDGE_USER", "judge"]
 
 
 JUDGE_SYSTEM = """You are an experienced equity-research editor scoring a value-chain investment thesis.
