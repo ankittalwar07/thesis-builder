@@ -1,0 +1,586 @@
+{
+  "schema_version": 1,
+  "slug": "energy_transition",
+  "theme": "Energy transition",
+  "run_date": "2026-11-08",
+  "sample": true,
+  "generated_by": "demo",
+  "thesis": {
+    "theme": "Energy transition",
+    "summary": "The most durable energy-transition exposure for the next three years is the grid build, not the renewable generation cell itself. Quanta, Eaton, GE Vernova, Hubbell, and Schneider are the picks-and-shovels for hyperscaler-driven and reshoring-driven electrical-infrastructure capex. Renewable cell economics (solar modules, lithium batteries) are pressured by Chinese overcapacity. Solid-state batteries, hydrogen, and SMRs are narrative-rich but execution-poor; public equity is the wrong vehicle for those bets today. Copper supply is the most structural commodity tailwind.",
+    "nodes": [
+      {
+        "name": "Critical minerals (Cu, Li, Ni, Co)",
+        "layer": "raw_inputs",
+        "description": "Copper supply is tight; lithium has stabilized; nickel/cobalt remain oversupplied.",
+        "public_names": [
+          "FCX",
+          "ALB",
+          "SQM"
+        ],
+        "private_names": [],
+        "catalysts": [
+          "Smelter TC/RC at multi-year lows"
+        ],
+        "risks": [
+          "LFP chemistry reduces nickel/cobalt need"
+        ],
+        "sources": [
+          "https://www.example.com/e/cu-smelter",
+          "https://www.example.com/e/li-price",
+          "https://www.example.com/e/alb",
+          "https://www.example.com/e/co"
+        ],
+        "confidence": 0.72
+      },
+      {
+        "name": "Battery cells",
+        "layer": "integrators",
+        "description": "CATL and LG Energy Solution dominate; LFP for stationary storage growing fastest.",
+        "public_names": [],
+        "private_names": [
+          "CATL",
+          "LG Energy Solution",
+          "Panasonic"
+        ],
+        "catalysts": [
+          "Energy storage capacity ramp"
+        ],
+        "risks": [
+          "Chinese overcapacity caps pricing"
+        ],
+        "sources": [
+          "https://www.example.com/e/catl",
+          "https://www.example.com/e/lge"
+        ],
+        "confidence": 0.7
+      },
+      {
+        "name": "Solid-state batteries",
+        "layer": "enabling",
+        "description": "QuantumScape and Sila are the public-equity proxies; commercialization risk remains high.",
+        "public_names": [
+          "QS"
+        ],
+        "private_names": [
+          "Sila"
+        ],
+        "catalysts": [
+          "Pilot line cell shipments"
+        ],
+        "risks": [
+          "Timeline slippage"
+        ],
+        "sources": [
+          "https://www.example.com/e/qs"
+        ],
+        "confidence": 0.4
+      },
+      {
+        "name": "Solar PV",
+        "layer": "enabling",
+        "description": "First Solar sold out at fixed pricing; Enphase holds US residential.",
+        "public_names": [
+          "FSLR",
+          "ENPH"
+        ],
+        "private_names": [],
+        "catalysts": [
+          "Series 7 capacity ramp"
+        ],
+        "risks": [
+          "Tariff regime changes"
+        ],
+        "sources": [
+          "https://www.example.com/e/fslr",
+          "https://www.example.com/e/enph"
+        ],
+        "confidence": 0.74
+      },
+      {
+        "name": "Wind",
+        "layer": "integrators",
+        "description": "Vestas pricing recovers; offshore segment still under stress.",
+        "public_names": [],
+        "private_names": [
+          "Vestas"
+        ],
+        "catalysts": [
+          "Onshore pricing inflection"
+        ],
+        "risks": [
+          "Permitting delays"
+        ],
+        "sources": [
+          "https://www.example.com/e/vws"
+        ],
+        "confidence": 0.6
+      },
+      {
+        "name": "Grid build-out",
+        "layer": "enabling",
+        "description": "Quanta, GE Vernova, Eaton, Hubbell, Siemens Energy, the deepest moat in energy transition today.",
+        "public_names": [
+          "PWR",
+          "GEV",
+          "ETN",
+          "HUBB"
+        ],
+        "private_names": [
+          "Siemens Energy",
+          "Schneider Electric"
+        ],
+        "catalysts": [
+          "Record HVDC and transformer orders"
+        ],
+        "risks": [
+          "Customer concentration in hyperscalers"
+        ],
+        "sources": [
+          "https://www.example.com/e/pwr",
+          "https://www.example.com/e/gev",
+          "https://www.example.com/e/etn",
+          "https://www.example.com/e/hubb",
+          "https://www.example.com/e/siemens"
+        ],
+        "confidence": 0.88
+      },
+      {
+        "name": "Power electronics & software",
+        "layer": "enabling",
+        "description": "Schneider EcoStruxure and grid-orchestration software is the highest-margin layer.",
+        "public_names": [],
+        "private_names": [
+          "Schneider Electric"
+        ],
+        "catalysts": [
+          "Software ARR growth"
+        ],
+        "risks": [
+          "Hyperscaler in-house buildouts"
+        ],
+        "sources": [
+          "https://www.example.com/e/schneider"
+        ],
+        "confidence": 0.66
+      },
+      {
+        "name": "Nuclear (SMRs, restarts)",
+        "layer": "integrators",
+        "description": "Holtec restarts, Oklo behind-the-meter SMRs for data centers, narrative-rich, lumpy execution.",
+        "public_names": [
+          "SMR",
+          "OKLO"
+        ],
+        "private_names": [
+          "Holtec"
+        ],
+        "catalysts": [
+          "Data-center PPA signings"
+        ],
+        "risks": [
+          "Project delays (NuScale precedent)"
+        ],
+        "sources": [
+          "https://www.example.com/e/smr",
+          "https://www.example.com/e/holtec",
+          "https://www.example.com/e/oklo"
+        ],
+        "confidence": 0.5
+      },
+      {
+        "name": "Hydrogen",
+        "layer": "enabling",
+        "description": "Plug Power and Bloom remain narrative plays; Bloom has near-term data-center pull.",
+        "public_names": [
+          "PLUG",
+          "BE"
+        ],
+        "private_names": [],
+        "catalysts": [
+          "Behind-the-meter data-center fuel cells"
+        ],
+        "risks": [
+          "Tax-credit dependency"
+        ],
+        "sources": [
+          "https://www.example.com/e/plug",
+          "https://www.example.com/e/be"
+        ],
+        "confidence": 0.42
+      },
+      {
+        "name": "Electrification end-markets",
+        "layer": "applications",
+        "description": "Heat pumps (Carrier, Trane), EV charging (ChargePoint, EVgo).",
+        "public_names": [
+          "CARR",
+          "TT",
+          "CHPT",
+          "EVGO"
+        ],
+        "private_names": [],
+        "catalysts": [
+          "Trane data-center HVAC growth"
+        ],
+        "risks": [
+          "Residential heat-pump growth slowing"
+        ],
+        "sources": [
+          "https://www.example.com/e/carr",
+          "https://www.example.com/e/tt",
+          "https://www.example.com/e/chpt",
+          "https://www.example.com/e/evgo"
+        ],
+        "confidence": 0.55
+      }
+    ],
+    "investable_picks": [
+      "ETN: best risk/reward in grid electrification: data-center + reshoring tailwinds, durable margins.",
+      "PWR: Quanta is the prime contractor for the grid build; backlog visibility through decade.",
+      "FSLR: sold-out Series 7 at fixed prices = pricing power that doesn't show up in spot data.",
+      "GEV: GE Vernova's HVDC franchise is uniquely positioned for inter-regional transmission.",
+      "FCX: leveraged exposure to structurally tight copper supply, with a buyback optionality."
+    ],
+    "skeptic_notes": [
+      "Most 'energy transition' returns the next 3 years come from the grid, not the cells.",
+      "Solid-state batteries and green hydrogen remain prove-it stories, public equity is too early.",
+      "Hyperscaler power demand is the dominant marginal buyer; data center is the new utility customer.",
+      "Chinese cell overcapacity caps battery margins; the picks-and-shovels (grid, power electronics) escape.",
+      "Nuclear-SMR euphoria forgets the NuScale precedent, first-of-kind timelines slip."
+    ],
+    "generated_at": "2026-11-08T19:35:57.349703Z"
+  },
+  "memo_md": "# Energy transition: Value Chain Thesis\n\n## Summary\n\nThe most durable energy-transition exposure for the next three years is the grid build, not the renewable generation cell itself. Quanta, Eaton, GE Vernova, Hubbell, and Schneider are the picks-and-shovels for hyperscaler-driven and reshoring-driven electrical-infrastructure capex. Renewable cell economics (solar modules, lithium batteries) are pressured by Chinese overcapacity. Solid-state batteries, hydrogen, and SMRs are narrative-rich but execution-poor; public equity is the wrong vehicle for those bets today. Copper supply is the most structural commodity tailwind.\n\n## Value chain\n\n### Raw inputs\n\n- **Critical minerals (Cu, Li, Ni, Co)** (FCX, ALB, SQM), Copper supply is tight; lithium has stabilized; nickel/cobalt remain oversupplied.\n\n### Enabling layer\n\n- **Solid-state batteries** (QS), QuantumScape and Sila are the public-equity proxies; commercialization risk remains high.\n- **Solar PV** (FSLR, ENPH), First Solar sold out at fixed pricing; Enphase holds US residential.\n- **Grid build-out** (PWR, GEV, ETN, HUBB), Quanta, GE Vernova, Eaton, Hubbell, Siemens Energy, the deepest moat in energy transition today.\n- **Power electronics & software** (, ), Schneider EcoStruxure and grid-orchestration software is the highest-margin layer.\n- **Hydrogen** (PLUG, BE), Plug Power and Bloom remain narrative plays; Bloom has near-term data-center pull.\n\n### Integrators\n\n- **Battery cells** (, ), CATL and LG Energy Solution dominate; LFP for stationary storage growing fastest.\n- **Wind** (, ), Vestas pricing recovers; offshore segment still under stress.\n- **Nuclear (SMRs, restarts)** (SMR, OKLO), Holtec restarts, Oklo behind-the-meter SMRs for data centers, narrative-rich, lumpy execution.\n\n### Applications\n\n- **Electrification end-markets** (CARR, TT, CHPT, EVGO), Heat pumps (Carrier, Trane), EV charging (ChargePoint, EVgo).\n\n## Investable picks\n\n1. ETN, best risk/reward in grid electrification: data-center + reshoring tailwinds, durable margins.\n2. PWR, Quanta is the prime contractor for the grid build; backlog visibility through decade.\n3. FSLR, sold-out Series 7 at fixed prices = pricing power that doesn't show up in spot data.\n4. GEV, GE Vernova's HVDC franchise is uniquely positioned for inter-regional transmission.\n5. FCX, leveraged exposure to structurally tight copper supply, with a buyback optionality.\n\n## What we'd have to be wrong about\n\n- Most 'energy transition' returns the next 3 years come from the grid, not the cells.\n- Solid-state batteries and green hydrogen remain prove-it stories, public equity is too early.\n- Hyperscaler power demand is the dominant marginal buyer; data center is the new utility customer.\n- Chinese cell overcapacity caps battery margins; the picks-and-shovels (grid, power electronics) escape.\n- Nuclear-SMR euphoria forgets the NuScale precedent, first-of-kind timelines slip.\n\n## Sources\n\n- https://www.example.com/e/alb\n- https://www.example.com/e/be\n- https://www.example.com/e/carr\n- https://www.example.com/e/catl\n- https://www.example.com/e/chpt\n- https://www.example.com/e/co\n- https://www.example.com/e/cu-smelter\n- https://www.example.com/e/enph\n- https://www.example.com/e/etn\n- https://www.example.com/e/evgo\n- https://www.example.com/e/fslr\n- https://www.example.com/e/gev\n- https://www.example.com/e/holtec\n- https://www.example.com/e/hubb\n- https://www.example.com/e/lge\n- https://www.example.com/e/li-price\n- https://www.example.com/e/oklo\n- https://www.example.com/e/plug\n- https://www.example.com/e/pwr\n- https://www.example.com/e/qs\n- https://www.example.com/e/schneider\n- https://www.example.com/e/siemens\n- https://www.example.com/e/smr\n- https://www.example.com/e/tt\n- https://www.example.com/e/vws",
+  "diagram_mmd": "graph LR\n  subgraph raw[Raw inputs]\n    r1[\"Critical minerals<br/>FCX, ALB\"]\n  end\n  subgraph enabling[Enabling]\n    e1[\"Grid build-out<br/>PWR, GEV, ETN, HUBB\"]\n    e2[\"Power electronics SW<br/>Schneider\"]\n    e3[\"Solar PV<br/>FSLR, ENPH\"]\n    e4[\"Solid-state<br/>QS\"]\n    e5[\"Hydrogen<br/>PLUG, BE\"]\n  end\n  subgraph integrators[Integrators]\n    i1[\"Battery cells<br/>CATL, LGES\"]\n    i2[\"Wind<br/>Vestas\"]\n    i3[\"Nuclear / SMR<br/>SMR, OKLO, Holtec\"]\n  end\n  subgraph applications[Applications]\n    a1[\"Electrification<br/>CARR, TT\"]\n    a2[\"EV charging<br/>CHPT, EVGO\"]\n  end\n  r1 --> i1\n  r1 --> e1\n  e3 --> i2\n  i1 --> a2\n  e1 --> a1\n  i3 --> a1",
+  "critiques": [
+    {
+      "node_name": "Battery cells",
+      "angle": "bottleneck_vs_commodity",
+      "verdict": "strong",
+      "argument": "Battery cells screens as a chokepoint today, but the relevant question is whether pricing power persists once a second supplier qualifies.",
+      "suggested_change": "",
+      "stance": "held",
+      "rebuttal": "Defense holds under this angle; the node stays in the tree at confidence 0.70."
+    },
+    {
+      "node_name": "Battery cells",
+      "angle": "priced_in",
+      "verdict": "strong",
+      "argument": "Consensus on Battery cells is constructive; the variant view is on duration, not direction.",
+      "suggested_change": "",
+      "stance": "held",
+      "rebuttal": "Defense holds under this angle; the node stays in the tree at confidence 0.70."
+    },
+    {
+      "node_name": "Battery cells",
+      "angle": "substitution_risk",
+      "verdict": "mixed",
+      "argument": "Battery cells's substitution path is real but underwritten, three years out is the right horizon, not one.",
+      "suggested_change": "",
+      "stance": "partial",
+      "rebuttal": "Partly conceded. The concern is carried into the memo's 'What we'd have to be wrong about' section; confidence 0.70."
+    },
+    {
+      "node_name": "Critical minerals (Cu, Li, Ni, Co)",
+      "angle": "bottleneck_vs_commodity",
+      "verdict": "strong",
+      "argument": "Critical minerals (Cu, Li, Ni, Co) screens as a chokepoint today, but the relevant question is whether pricing power persists once a second supplier qualifies.",
+      "suggested_change": "",
+      "stance": "held",
+      "rebuttal": "Defense holds under this angle; the node stays in the tree at confidence 0.72."
+    },
+    {
+      "node_name": "Critical minerals (Cu, Li, Ni, Co)",
+      "angle": "priced_in",
+      "verdict": "mixed",
+      "argument": "Consensus on Critical minerals (Cu, Li, Ni, Co) is constructive; the variant view is on duration, not direction.",
+      "suggested_change": "",
+      "stance": "partial",
+      "rebuttal": "Partly conceded. The concern is carried into the memo's 'What we'd have to be wrong about' section; confidence 0.72."
+    },
+    {
+      "node_name": "Critical minerals (Cu, Li, Ni, Co)",
+      "angle": "substitution_risk",
+      "verdict": "mixed",
+      "argument": "Critical minerals (Cu, Li, Ni, Co)'s substitution path is real but underwritten, three years out is the right horizon, not one.",
+      "suggested_change": "",
+      "stance": "partial",
+      "rebuttal": "Partly conceded. The concern is carried into the memo's 'What we'd have to be wrong about' section; confidence 0.72."
+    },
+    {
+      "node_name": "Electrification end-markets",
+      "angle": "bottleneck_vs_commodity",
+      "verdict": "mixed",
+      "argument": "Electrification end-markets screens as a chokepoint today, but the relevant question is whether pricing power persists once a second supplier qualifies.",
+      "suggested_change": "",
+      "stance": "partial",
+      "rebuttal": "Partly conceded. The concern is carried into the memo's 'What we'd have to be wrong about' section; confidence 0.55."
+    },
+    {
+      "node_name": "Electrification end-markets",
+      "angle": "priced_in",
+      "verdict": "strong",
+      "argument": "Consensus on Electrification end-markets is constructive; the variant view is on duration, not direction.",
+      "suggested_change": "",
+      "stance": "held",
+      "rebuttal": "Defense holds under this angle; the node stays in the tree at confidence 0.55."
+    },
+    {
+      "node_name": "Electrification end-markets",
+      "angle": "substitution_risk",
+      "verdict": "strong",
+      "argument": "Electrification end-markets's substitution path is real but underwritten, three years out is the right horizon, not one.",
+      "suggested_change": "",
+      "stance": "held",
+      "rebuttal": "Defense holds under this angle; the node stays in the tree at confidence 0.55."
+    },
+    {
+      "node_name": "Grid build-out",
+      "angle": "bottleneck_vs_commodity",
+      "verdict": "strong",
+      "argument": "Grid build-out screens as a chokepoint today, but the relevant question is whether pricing power persists once a second supplier qualifies.",
+      "suggested_change": "",
+      "stance": "held",
+      "rebuttal": "Defense holds under this angle; the node stays in the tree at confidence 0.88."
+    },
+    {
+      "node_name": "Grid build-out",
+      "angle": "priced_in",
+      "verdict": "mixed",
+      "argument": "Consensus on Grid build-out is constructive; the variant view is on duration, not direction.",
+      "suggested_change": "",
+      "stance": "partial",
+      "rebuttal": "Partly conceded. The concern is carried into the memo's 'What we'd have to be wrong about' section; confidence 0.88."
+    },
+    {
+      "node_name": "Grid build-out",
+      "angle": "substitution_risk",
+      "verdict": "strong",
+      "argument": "Grid build-out's substitution path is real but underwritten, three years out is the right horizon, not one.",
+      "suggested_change": "",
+      "stance": "held",
+      "rebuttal": "Defense holds under this angle; the node stays in the tree at confidence 0.88."
+    },
+    {
+      "node_name": "Hydrogen",
+      "angle": "bottleneck_vs_commodity",
+      "verdict": "weak",
+      "argument": "Hydrogen screens as a chokepoint today, but the relevant question is whether pricing power persists once a second supplier qualifies.",
+      "suggested_change": "demote confidence by 0.1",
+      "stance": "conceded",
+      "rebuttal": "Conceded. Skeptic's suggested change: demote confidence by 0.1. Final confidence 0.42."
+    },
+    {
+      "node_name": "Hydrogen",
+      "angle": "priced_in",
+      "verdict": "weak",
+      "argument": "Consensus on Hydrogen is constructive; the variant view is on duration, not direction.",
+      "suggested_change": "demote confidence by 0.1",
+      "stance": "conceded",
+      "rebuttal": "Conceded. Skeptic's suggested change: demote confidence by 0.1. Final confidence 0.42."
+    },
+    {
+      "node_name": "Hydrogen",
+      "angle": "substitution_risk",
+      "verdict": "weak",
+      "argument": "Hydrogen's substitution path is real but underwritten, three years out is the right horizon, not one.",
+      "suggested_change": "demote confidence by 0.1",
+      "stance": "conceded",
+      "rebuttal": "Conceded. Skeptic's suggested change: demote confidence by 0.1. Final confidence 0.42."
+    },
+    {
+      "node_name": "Nuclear (SMRs, restarts)",
+      "angle": "bottleneck_vs_commodity",
+      "verdict": "weak",
+      "argument": "Nuclear (SMRs, restarts) screens as a chokepoint today, but the relevant question is whether pricing power persists once a second supplier qualifies.",
+      "suggested_change": "demote confidence by 0.1",
+      "stance": "conceded",
+      "rebuttal": "Conceded. Skeptic's suggested change: demote confidence by 0.1. Final confidence 0.50."
+    },
+    {
+      "node_name": "Nuclear (SMRs, restarts)",
+      "angle": "priced_in",
+      "verdict": "weak",
+      "argument": "Consensus on Nuclear (SMRs, restarts) is constructive; the variant view is on duration, not direction.",
+      "suggested_change": "demote confidence by 0.1",
+      "stance": "conceded",
+      "rebuttal": "Conceded. Skeptic's suggested change: demote confidence by 0.1. Final confidence 0.50."
+    },
+    {
+      "node_name": "Nuclear (SMRs, restarts)",
+      "angle": "substitution_risk",
+      "verdict": "weak",
+      "argument": "Nuclear (SMRs, restarts)'s substitution path is real but underwritten, three years out is the right horizon, not one.",
+      "suggested_change": "demote confidence by 0.1",
+      "stance": "conceded",
+      "rebuttal": "Conceded. Skeptic's suggested change: demote confidence by 0.1. Final confidence 0.50."
+    },
+    {
+      "node_name": "Power electronics & software",
+      "angle": "bottleneck_vs_commodity",
+      "verdict": "strong",
+      "argument": "Power electronics & software screens as a chokepoint today, but the relevant question is whether pricing power persists once a second supplier qualifies.",
+      "suggested_change": "",
+      "stance": "held",
+      "rebuttal": "Defense holds under this angle; the node stays in the tree at confidence 0.66."
+    },
+    {
+      "node_name": "Power electronics & software",
+      "angle": "priced_in",
+      "verdict": "weak",
+      "argument": "Consensus on Power electronics & software is constructive; the variant view is on duration, not direction.",
+      "suggested_change": "demote confidence by 0.1",
+      "stance": "conceded",
+      "rebuttal": "Conceded. Skeptic's suggested change: demote confidence by 0.1. Final confidence 0.66."
+    },
+    {
+      "node_name": "Power electronics & software",
+      "angle": "substitution_risk",
+      "verdict": "strong",
+      "argument": "Power electronics & software's substitution path is real but underwritten, three years out is the right horizon, not one.",
+      "suggested_change": "",
+      "stance": "held",
+      "rebuttal": "Defense holds under this angle; the node stays in the tree at confidence 0.66."
+    },
+    {
+      "node_name": "Solar PV",
+      "angle": "bottleneck_vs_commodity",
+      "verdict": "mixed",
+      "argument": "Solar PV screens as a chokepoint today, but the relevant question is whether pricing power persists once a second supplier qualifies.",
+      "suggested_change": "",
+      "stance": "partial",
+      "rebuttal": "Partly conceded. The concern is carried into the memo's 'What we'd have to be wrong about' section; confidence 0.74."
+    },
+    {
+      "node_name": "Solar PV",
+      "angle": "priced_in",
+      "verdict": "strong",
+      "argument": "Consensus on Solar PV is constructive; the variant view is on duration, not direction.",
+      "suggested_change": "",
+      "stance": "held",
+      "rebuttal": "Defense holds under this angle; the node stays in the tree at confidence 0.74."
+    },
+    {
+      "node_name": "Solar PV",
+      "angle": "substitution_risk",
+      "verdict": "mixed",
+      "argument": "Solar PV's substitution path is real but underwritten, three years out is the right horizon, not one.",
+      "suggested_change": "",
+      "stance": "partial",
+      "rebuttal": "Partly conceded. The concern is carried into the memo's 'What we'd have to be wrong about' section; confidence 0.74."
+    },
+    {
+      "node_name": "Solid-state batteries",
+      "angle": "bottleneck_vs_commodity",
+      "verdict": "weak",
+      "argument": "Solid-state batteries screens as a chokepoint today, but the relevant question is whether pricing power persists once a second supplier qualifies.",
+      "suggested_change": "demote confidence by 0.1",
+      "stance": "conceded",
+      "rebuttal": "Conceded. Skeptic's suggested change: demote confidence by 0.1. Final confidence 0.40."
+    },
+    {
+      "node_name": "Solid-state batteries",
+      "angle": "priced_in",
+      "verdict": "mixed",
+      "argument": "Consensus on Solid-state batteries is constructive; the variant view is on duration, not direction.",
+      "suggested_change": "",
+      "stance": "partial",
+      "rebuttal": "Partly conceded. The concern is carried into the memo's 'What we'd have to be wrong about' section; confidence 0.40."
+    },
+    {
+      "node_name": "Solid-state batteries",
+      "angle": "substitution_risk",
+      "verdict": "strong",
+      "argument": "Solid-state batteries's substitution path is real but underwritten, three years out is the right horizon, not one.",
+      "suggested_change": "",
+      "stance": "held",
+      "rebuttal": "Defense holds under this angle; the node stays in the tree at confidence 0.40."
+    },
+    {
+      "node_name": "Wind",
+      "angle": "bottleneck_vs_commodity",
+      "verdict": "mixed",
+      "argument": "Wind screens as a chokepoint today, but the relevant question is whether pricing power persists once a second supplier qualifies.",
+      "suggested_change": "",
+      "stance": "partial",
+      "rebuttal": "Partly conceded. The concern is carried into the memo's 'What we'd have to be wrong about' section; confidence 0.60."
+    },
+    {
+      "node_name": "Wind",
+      "angle": "priced_in",
+      "verdict": "weak",
+      "argument": "Consensus on Wind is constructive; the variant view is on duration, not direction.",
+      "suggested_change": "demote confidence by 0.1",
+      "stance": "conceded",
+      "rebuttal": "Conceded. Skeptic's suggested change: demote confidence by 0.1. Final confidence 0.60."
+    },
+    {
+      "node_name": "Wind",
+      "angle": "substitution_risk",
+      "verdict": "strong",
+      "argument": "Wind's substitution path is real but underwritten, three years out is the right horizon, not one.",
+      "suggested_change": "",
+      "stance": "held",
+      "rebuttal": "Defense holds under this angle; the node stays in the tree at confidence 0.60."
+    }
+  ],
+  "headline_concerns": [
+    "Most 'energy transition' returns the next 3 years come from the grid, not the cells.",
+    "Solid-state batteries and green hydrogen remain prove-it stories, public equity is too early.",
+    "Hyperscaler power demand is the dominant marginal buyer; data center is the new utility customer.",
+    "Chinese cell overcapacity caps battery margins; the picks-and-shovels (grid, power electronics) escape.",
+    "Nuclear-SMR euphoria forgets the NuScale precedent, first-of-kind timelines slip."
+  ],
+  "research": {
+    "queries_run": 16,
+    "unique_urls": 26,
+    "summaries": 26,
+    "search_queries": [
+      "lithium price 2026 Albemarle SQM",
+      "copper supply deficit smelter capacity",
+      "battery cell capacity CATL LG Energy",
+      "QuantumScape solid-state battery commercialization",
+      "First Solar utility-scale module pricing",
+      "Enphase microinverter US residential",
+      "grid transmission Quanta PWR backlog",
+      "EV charging infrastructure ChargePoint EVgo",
+      "heat pump adoption Carrier Trane Lennox",
+      "wind turbine OEM Vestas Siemens Gamesa",
+      "nuclear SMR NuScale Holtec Oklo",
+      "hydrogen electrolyzer Plug Power Bloom",
+      "cobalt nickel supply DRC Indonesia",
+      "GE Vernova grid orders backlog",
+      "Eaton electrification cycle data center",
+      "Schneider Electric EcoStruxure software"
+    ]
+  },
+  "eval": {
+    "judge": "demo stub (canned scores, not a real evaluation)",
+    "scores": {
+      "coverage": {
+        "score": 4,
+        "justification": "Canned demo score. A real rubric score replaces it after the first Claude run."
+      },
+      "specificity": {
+        "score": 4,
+        "justification": "Canned demo score. A real rubric score replaces it after the first Claude run."
+      },
+      "novelty": {
+        "score": 3,
+        "justification": "Canned demo score. A real rubric score replaces it after the first Claude run."
+      },
+      "actionability": {
+        "score": 4,
+        "justification": "Canned demo score. A real rubric score replaces it after the first Claude run."
+      }
+    },
+    "total": 15,
+    "scored_at": "2026-11-08",
+    "hard_checks": {
+      "golden": "evals/golden/energy_transition.yaml",
+      "passed": true,
+      "failures": []
+    }
+  }
+}
