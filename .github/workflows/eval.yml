@@ -1,38 +1,54 @@
 name: eval
 
 on:
+  push:
+    branches: [main]
   pull_request:
     branches: [main]
   workflow_dispatch:
 
 jobs:
-  smoke:
-    # Always-on: imports + config parse, no API keys required.
+  offline:
+    # Always on, needs no API keys: imports, offline demo pipeline, published
+    # data contract (docs/data), validator, and a syntax check of the Pages UI.
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
       - name: Install uv
         run: pip install uv
-      - name: Install project
-        run: uv sync --no-dev
+      - name: Install project (with dev extras)
+        run: uv sync --extra dev
       - name: Smoke-import all modules
         run: |
           uv run python -c "
           import thesis_builder, thesis_builder.llm, thesis_builder.tools
           import thesis_builder.schemas, thesis_builder.prompts, thesis_builder.graph
+          import thesis_builder.publish, thesis_builder.server
           from thesis_builder.agents import Researcher, Skeptic, Synthesizer
           import yaml; yaml.safe_load(open('config/models.yaml'))
           print('ok')
           "
+      - name: Lint
+        run: uv run ruff check src scripts tests evals
+      - name: Offline tests (demo pipeline, publish contract, validator)
+        run: uv run pytest -q
+      - name: Validate GitHub Pages data
+        run: uv run python scripts/validate_thesis.py
+      - name: Check Pages UI script
+        run: node --check docs/app.js
 
   golden-eval:
-    # Live eval against the three golden themes. Skipped unless the repo has
-    # the required secrets — pricey to run on every PR otherwise.
+    # Live LiteLLM eval against the three golden themes. Costs money, so it is
+    # skipped unless the repo variable RUN_GOLDEN_EVAL is 'true' and the key
+    # secrets are configured. The default Claude-routine path never needs it.
     runs-on: ubuntu-latest
-    needs: smoke
+    needs: offline
     if: ${{ vars.RUN_GOLDEN_EVAL == 'true' }}
     timeout-minutes: 45
     env:
