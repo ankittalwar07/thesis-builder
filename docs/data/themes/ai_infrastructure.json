@@ -1,0 +1,727 @@
+{
+  "schema_version": 1,
+  "slug": "ai_infrastructure",
+  "theme": "AI infrastructure",
+  "run_date": "2026-11-08",
+  "sample": true,
+  "generated_by": "demo",
+  "thesis": {
+    "theme": "AI infrastructure",
+    "summary": "AI compute capex flows through three tangible chokepoints: ASML's EUV monopoly, TSMC's CoWoS packaging capacity, and the HBM oligopoly anchored by SK Hynix and Micron. Power and cooling (Vertiv, Eaton) are catching up in importance as 1-GW campuses become the unit of scale. The durable owners are the picks-and-shovels; accelerator margins (NVDA, AMD) face real ASIC competition from Broadcom's hyperscaler franchise. The bear case is straightforward, hyperscaler capex is running ahead of any clear AI revenue, and the chain is one capex guide-down away from a sharp re-rating. We hedge by skewing picks toward bottlenecks that would still bind if growth merely persists rather than accelerates.",
+    "nodes": [
+      {
+        "name": "Critical minerals (Cu, REEs, samarium)",
+        "layer": "raw_inputs",
+        "description": "Copper for switchgear, rare earths for high-density motors and AI server fans.",
+        "public_names": [
+          "FCX"
+        ],
+        "private_names": [],
+        "catalysts": [
+          "China export curbs tighten REE supply"
+        ],
+        "risks": [
+          "Substitution to ferrite magnets in some applications"
+        ],
+        "sources": [
+          "https://www.example.com/ai/rare-earth"
+        ],
+        "confidence": 0.55
+      },
+      {
+        "name": "Power generation & PPAs",
+        "layer": "raw_inputs",
+        "description": "Nuclear and gas PPAs underwriting hyperscaler load growth.",
+        "public_names": [
+          "CEG",
+          "D"
+        ],
+        "private_names": [],
+        "catalysts": [
+          "Three Mile Island restart 2028",
+          "PJM auction 10x clearing price"
+        ],
+        "risks": [
+          "Interconnection queues slip"
+        ],
+        "sources": [
+          "https://www.example.com/ai/ceg-msft",
+          "https://www.example.com/ai/pjm-auction"
+        ],
+        "confidence": 0.75
+      },
+      {
+        "name": "Grid interconnection capacity",
+        "layer": "raw_inputs",
+        "description": "Transmission and substation buildout gating data center site readiness.",
+        "public_names": [
+          "D"
+        ],
+        "private_names": [],
+        "catalysts": [
+          "Virginia queue at 30 GW"
+        ],
+        "risks": [
+          "Permit delays in PJM"
+        ],
+        "sources": [
+          "https://www.example.com/ai/dominion-queue"
+        ],
+        "confidence": 0.6
+      },
+      {
+        "name": "EUV lithography",
+        "layer": "enabling",
+        "description": "ASML monopoly on EUV and High-NA EUV is the deepest chokepoint in the chain.",
+        "public_names": [
+          "ASML"
+        ],
+        "private_names": [],
+        "catalysts": [
+          "High-NA shipments to Intel, TSMC ramp"
+        ],
+        "risks": [
+          "Geopolitical export restrictions"
+        ],
+        "sources": [
+          "https://www.example.com/ai/asml-high-na"
+        ],
+        "confidence": 0.92
+      },
+      {
+        "name": "Advanced packaging (CoWoS)",
+        "layer": "enabling",
+        "description": "TSMC CoWoS capacity is the binding constraint for Blackwell-class accelerators.",
+        "public_names": [
+          "TSM"
+        ],
+        "private_names": [],
+        "catalysts": [
+          "CoWoS capacity 2x by EOY 2025"
+        ],
+        "risks": [
+          "Yield on next-gen substrates"
+        ],
+        "sources": [
+          "https://www.example.com/ai/tsmc-cowos"
+        ],
+        "confidence": 0.9
+      },
+      {
+        "name": "HBM memory",
+        "layer": "enabling",
+        "description": "SK Hynix is the volume leader; Micron is the marginal supplier with the largest upside.",
+        "public_names": [
+          "MU"
+        ],
+        "private_names": [
+          "SK Hynix"
+        ],
+        "catalysts": [
+          "Micron qualified at Nvidia"
+        ],
+        "risks": [
+          "Samsung qualification could pressure pricing"
+        ],
+        "sources": [
+          "https://www.example.com/ai/micron-hbm"
+        ],
+        "confidence": 0.82
+      },
+      {
+        "name": "Networking silicon & optics",
+        "layer": "enabling",
+        "description": "Switch ASICs and DSP/VCSEL optics; tightly coupled to scale-up cluster sizes.",
+        "public_names": [
+          "AVGO",
+          "MRVL",
+          "COHR"
+        ],
+        "private_names": [],
+        "catalysts": [
+          "1.6T optics ramp"
+        ],
+        "risks": [
+          "Co-packaged optics displaces pluggables"
+        ],
+        "sources": [
+          "https://www.example.com/ai/mrvl-1.6t",
+          "https://www.example.com/ai/cohr-vcsel"
+        ],
+        "confidence": 0.78
+      },
+      {
+        "name": "Power, cooling, electrical",
+        "layer": "enabling",
+        "description": "Vertiv, Eaton, Schneider, picks-and-shovels for 1-GW data center campuses.",
+        "public_names": [
+          "VRT",
+          "ETN"
+        ],
+        "private_names": [
+          "Schneider Electric"
+        ],
+        "catalysts": [
+          "Record backlogs on liquid cooling"
+        ],
+        "risks": [
+          "Cooling tech standardizing reduces margin"
+        ],
+        "sources": [
+          "https://www.example.com/ai/vertiv-q3",
+          "https://www.example.com/ai/eaton-grid"
+        ],
+        "confidence": 0.83
+      },
+      {
+        "name": "Accelerator design",
+        "layer": "integrators",
+        "description": "Nvidia dominates training; AMD gaining inference; Broadcom owns the hyperscaler ASIC slot.",
+        "public_names": [
+          "NVDA",
+          "AMD",
+          "AVGO"
+        ],
+        "private_names": [],
+        "catalysts": [
+          "MI325X design wins",
+          "Blackwell ramp"
+        ],
+        "risks": [
+          "ASIC TCO undercuts merchant GPU at scale"
+        ],
+        "sources": [
+          "https://www.example.com/ai/nvda-blackwell",
+          "https://www.example.com/ai/amd-mi325",
+          "https://www.example.com/ai/avgo-tpu"
+        ],
+        "confidence": 0.85
+      },
+      {
+        "name": "Servers & systems integration",
+        "layer": "integrators",
+        "description": "Supermicro and Dell ship AI racks; CoreWeave / neo-clouds buy them.",
+        "public_names": [
+          "SMCI",
+          "DELL",
+          "CRWV"
+        ],
+        "private_names": [
+          "Lambda"
+        ],
+        "catalysts": [
+          "Liquid-cooled rack ramp"
+        ],
+        "risks": [
+          "Margin compression as ODMs commoditize"
+        ],
+        "sources": [
+          "https://www.example.com/ai/smci-lambda",
+          "https://www.example.com/ai/crwv"
+        ],
+        "confidence": 0.68
+      },
+      {
+        "name": "Data center real estate",
+        "layer": "enabling",
+        "description": "Equinix and Digital Realty hold the prime metros; xScale capacity is pre-leased.",
+        "public_names": [
+          "EQIX",
+          "DLR"
+        ],
+        "private_names": [],
+        "catalysts": [
+          "Record leasing volumes"
+        ],
+        "risks": [
+          "Power-constrained markets cap growth"
+        ],
+        "sources": [
+          "https://www.example.com/ai/eqix-xscale",
+          "https://www.example.com/ai/dlr"
+        ],
+        "confidence": 0.72
+      },
+      {
+        "name": "Hyperscaler model hosting",
+        "layer": "applications",
+        "description": "MSFT, GOOGL, AMZN, META capture the bulk of training and inference spend.",
+        "public_names": [
+          "MSFT",
+          "GOOGL",
+          "AMZN",
+          "META"
+        ],
+        "private_names": [
+          "OpenAI",
+          "Anthropic"
+        ],
+        "catalysts": [
+          "$200B+ annualized capex"
+        ],
+        "risks": [
+          "ROI on AI capex remains unproven"
+        ],
+        "sources": [
+          "https://www.example.com/ai/capex",
+          "https://www.example.com/ai/anthropic-trainium",
+          "https://www.example.com/ai/openai-stargate"
+        ],
+        "confidence": 0.7
+      },
+      {
+        "name": "Inference at the edge",
+        "layer": "applications",
+        "description": "Apple Silicon and Qualcomm AI100 push inference onto devices and private clouds.",
+        "public_names": [
+          "AAPL",
+          "QCOM"
+        ],
+        "private_names": [],
+        "catalysts": [
+          "Apple Private Cloud Compute"
+        ],
+        "risks": [
+          "Cloud inference TCO falls faster than expected"
+        ],
+        "sources": [
+          "https://www.example.com/ai/aapl-pcc",
+          "https://www.example.com/ai/qcom-ai100"
+        ],
+        "confidence": 0.6
+      }
+    ],
+    "investable_picks": [
+      "ASML: EUV monopoly is the deepest chokepoint; High-NA cycle extends moat into the next decade.",
+      "TSM: CoWoS capacity is the binding constraint on AI accelerator supply; lock-in across NVDA, AMD, AVGO.",
+      "MU: marginal HBM supplier with the largest unit-economic delta as supply tightens through 2026.",
+      "VRT: liquid cooling and busway capture every 1-GW campus build, with record backlog visibility.",
+      "AVGO: owns the hyperscaler custom-silicon slot (TPU + MTIA) plus the switch-ASIC franchise."
+    ],
+    "skeptic_notes": [
+      "Accelerator economics: merchant GPU margins compress as ASIC TCO improves at scale.",
+      "Power, not silicon, is the binding constraint for the next leg of AI capex.",
+      "HBM is a 2-supplier oligopoly today, a 3-supplier market by late 2025, pricing fades.",
+      "Hyperscaler ROI on AI capex is still unproven; a single quarter of pullback re-rates the chain.",
+      "Geopolitical export controls on EUV, HBM, and rare earths could fork the global supply chain.",
+      "Edge inference (Apple, Qualcomm) cannibalizes a slice of cloud demand if device-side models hit quality."
+    ],
+    "generated_at": "2026-11-08T19:35:52.452893Z"
+  },
+  "memo_md": "# AI infrastructure: Value Chain Thesis\n\n## Summary\n\nAI compute capex flows through three tangible chokepoints: ASML's EUV monopoly, TSMC's CoWoS packaging capacity, and the HBM oligopoly anchored by SK Hynix and Micron. Power and cooling (Vertiv, Eaton) are catching up in importance as 1-GW campuses become the unit of scale. The durable owners are the picks-and-shovels; accelerator margins (NVDA, AMD) face real ASIC competition from Broadcom's hyperscaler franchise. The bear case is straightforward, hyperscaler capex is running ahead of any clear AI revenue, and the chain is one capex guide-down away from a sharp re-rating. We hedge by skewing picks toward bottlenecks that would still bind if growth merely persists rather than accelerates.\n\n## Value chain\n\n### Raw inputs\n\n- **Critical minerals (Cu, REEs, samarium)** (FCX), Copper for switchgear, rare earths for high-density motors and AI server fans.\n- **Power generation & PPAs** (CEG, D), Nuclear and gas PPAs underwriting hyperscaler load growth.\n- **Grid interconnection capacity** (D), Transmission and substation buildout gating data center site readiness.\n\n### Enabling layer\n\n- **EUV lithography** (ASML), ASML monopoly on EUV and High-NA EUV is the deepest chokepoint in the chain.\n- **Advanced packaging (CoWoS)** (TSM), TSMC CoWoS capacity is the binding constraint for Blackwell-class accelerators.\n- **HBM memory** (MU), SK Hynix is the volume leader; Micron is the marginal supplier with the largest upside.\n- **Networking silicon & optics** (AVGO, MRVL, COHR), Switch ASICs and DSP/VCSEL optics; tightly coupled to scale-up cluster sizes.\n- **Power, cooling, electrical** (VRT, ETN), Vertiv, Eaton, Schneider, picks-and-shovels for 1-GW data center campuses.\n- **Data center real estate** (EQIX, DLR), Equinix and Digital Realty hold the prime metros; xScale capacity is pre-leased.\n\n### Integrators\n\n- **Accelerator design** (NVDA, AMD, AVGO), Nvidia dominates training; AMD gaining inference; Broadcom owns the hyperscaler ASIC slot.\n- **Servers & systems integration** (SMCI, DELL, CRWV), Supermicro and Dell ship AI racks; CoreWeave / neo-clouds buy them.\n\n### Applications\n\n- **Hyperscaler model hosting** (MSFT, GOOGL, AMZN, META), MSFT, GOOGL, AMZN, META capture the bulk of training and inference spend.\n- **Inference at the edge** (AAPL, QCOM), Apple Silicon and Qualcomm AI100 push inference onto devices and private clouds.\n\n## Investable picks\n\n1. ASML, EUV monopoly is the deepest chokepoint; High-NA cycle extends moat into the next decade.\n2. TSM, CoWoS capacity is the binding constraint on AI accelerator supply; lock-in across NVDA, AMD, AVGO.\n3. MU, marginal HBM supplier with the largest unit-economic delta as supply tightens through 2026.\n4. VRT, liquid cooling and busway capture every 1-GW campus build, with record backlog visibility.\n5. AVGO, owns the hyperscaler custom-silicon slot (TPU + MTIA) plus the switch-ASIC franchise.\n\n## What we'd have to be wrong about\n\n- Accelerator economics: merchant GPU margins compress as ASIC TCO improves at scale.\n- Power, not silicon, is the binding constraint for the next leg of AI capex.\n- HBM is a 2-supplier oligopoly today, a 3-supplier market by late 2025, pricing fades.\n- Hyperscaler ROI on AI capex is still unproven; a single quarter of pullback re-rates the chain.\n- Geopolitical export controls on EUV, HBM, and rare earths could fork the global supply chain.\n- Edge inference (Apple, Qualcomm) cannibalizes a slice of cloud demand if device-side models hit quality.\n\n## Sources\n\n- https://www.example.com/ai/aapl-pcc\n- https://www.example.com/ai/amd-mi325\n- https://www.example.com/ai/anthropic-trainium\n- https://www.example.com/ai/asml-high-na\n- https://www.example.com/ai/avgo-tpu\n- https://www.example.com/ai/capex\n- https://www.example.com/ai/ceg-msft\n- https://www.example.com/ai/cohr-vcsel\n- https://www.example.com/ai/crwv\n- https://www.example.com/ai/dlr\n- https://www.example.com/ai/dominion-queue\n- https://www.example.com/ai/eaton-grid\n- https://www.example.com/ai/eqix-xscale\n- https://www.example.com/ai/micron-hbm\n- https://www.example.com/ai/mrvl-1.6t\n- https://www.example.com/ai/nvda-blackwell\n- https://www.example.com/ai/openai-stargate\n- https://www.example.com/ai/pjm-auction\n- https://www.example.com/ai/qcom-ai100\n- https://www.example.com/ai/rare-earth\n- https://www.example.com/ai/smci-lambda\n- https://www.example.com/ai/tsmc-cowos\n- https://www.example.com/ai/vertiv-q3",
+  "diagram_mmd": "graph LR\n  subgraph raw[Raw inputs]\n    r1[\"Critical minerals<br/>FCX\"]\n    r2[\"Power & PPAs<br/>CEG, D\"]\n    r3[\"Grid interconnect<br/>Dominion\"]\n  end\n  subgraph enabling[Enabling]\n    e1[\"EUV lithography<br/>ASML\"]\n    e2[\"Adv. packaging<br/>TSM\"]\n    e3[\"HBM memory<br/>MU, SK Hynix\"]\n    e4[\"Networking silicon<br/>AVGO, MRVL\"]\n    e5[\"Power & cooling<br/>VRT, ETN\"]\n    e6[\"DC real estate<br/>EQIX, DLR\"]\n  end\n  subgraph integrators[Integrators]\n    i1[\"Accelerator design<br/>NVDA, AMD, AVGO\"]\n    i2[\"Systems & neo-clouds<br/>SMCI, CRWV\"]\n  end\n  subgraph applications[Applications]\n    a1[\"Hyperscaler hosting<br/>MSFT, GOOGL, AMZN\"]\n    a2[\"Edge inference<br/>AAPL, QCOM\"]\n  end\n  r1 --> e2\n  r2 --> e6\n  r3 --> e6\n  e1 --> e2 --> i1\n  e3 --> i1\n  e4 --> i1\n  e5 --> i2\n  e6 --> i2\n  i1 --> a1\n  i1 --> a2\n  i2 --> a1",
+  "critiques": [
+    {
+      "node_name": "Accelerator design",
+      "angle": "bottleneck_vs_commodity",
+      "verdict": "strong",
+      "argument": "Accelerator design screens as a chokepoint today, but the relevant question is whether pricing power persists once a second supplier qualifies.",
+      "suggested_change": "",
+      "stance": "held",
+      "rebuttal": "Defense holds under this angle; the node stays in the tree at confidence 0.85."
+    },
+    {
+      "node_name": "Accelerator design",
+      "angle": "priced_in",
+      "verdict": "strong",
+      "argument": "Consensus on Accelerator design is constructive; the variant view is on duration, not direction.",
+      "suggested_change": "",
+      "stance": "held",
+      "rebuttal": "Defense holds under this angle; the node stays in the tree at confidence 0.85."
+    },
+    {
+      "node_name": "Accelerator design",
+      "angle": "substitution_risk",
+      "verdict": "weak",
+      "argument": "Accelerator design's substitution path is real but underwritten, three years out is the right horizon, not one.",
+      "suggested_change": "demote confidence by 0.1",
+      "stance": "conceded",
+      "rebuttal": "Conceded. Skeptic's suggested change: demote confidence by 0.1. Final confidence 0.85."
+    },
+    {
+      "node_name": "Advanced packaging (CoWoS)",
+      "angle": "bottleneck_vs_commodity",
+      "verdict": "weak",
+      "argument": "Advanced packaging (CoWoS) screens as a chokepoint today, but the relevant question is whether pricing power persists once a second supplier qualifies.",
+      "suggested_change": "demote confidence by 0.1",
+      "stance": "conceded",
+      "rebuttal": "Conceded. Skeptic's suggested change: demote confidence by 0.1. Final confidence 0.90."
+    },
+    {
+      "node_name": "Advanced packaging (CoWoS)",
+      "angle": "priced_in",
+      "verdict": "strong",
+      "argument": "Consensus on Advanced packaging (CoWoS) is constructive; the variant view is on duration, not direction.",
+      "suggested_change": "",
+      "stance": "held",
+      "rebuttal": "Defense holds under this angle; the node stays in the tree at confidence 0.90."
+    },
+    {
+      "node_name": "Advanced packaging (CoWoS)",
+      "angle": "substitution_risk",
+      "verdict": "mixed",
+      "argument": "Advanced packaging (CoWoS)'s substitution path is real but underwritten, three years out is the right horizon, not one.",
+      "suggested_change": "",
+      "stance": "partial",
+      "rebuttal": "Partly conceded. The concern is carried into the memo's 'What we'd have to be wrong about' section; confidence 0.90."
+    },
+    {
+      "node_name": "Critical minerals (Cu, REEs, samarium)",
+      "angle": "bottleneck_vs_commodity",
+      "verdict": "strong",
+      "argument": "Critical minerals (Cu, REEs, samarium) screens as a chokepoint today, but the relevant question is whether pricing power persists once a second supplier qualifies.",
+      "suggested_change": "",
+      "stance": "held",
+      "rebuttal": "Defense holds under this angle; the node stays in the tree at confidence 0.55."
+    },
+    {
+      "node_name": "Critical minerals (Cu, REEs, samarium)",
+      "angle": "priced_in",
+      "verdict": "mixed",
+      "argument": "Consensus on Critical minerals (Cu, REEs, samarium) is constructive; the variant view is on duration, not direction.",
+      "suggested_change": "",
+      "stance": "partial",
+      "rebuttal": "Partly conceded. The concern is carried into the memo's 'What we'd have to be wrong about' section; confidence 0.55."
+    },
+    {
+      "node_name": "Critical minerals (Cu, REEs, samarium)",
+      "angle": "substitution_risk",
+      "verdict": "strong",
+      "argument": "Critical minerals (Cu, REEs, samarium)'s substitution path is real but underwritten, three years out is the right horizon, not one.",
+      "suggested_change": "",
+      "stance": "held",
+      "rebuttal": "Defense holds under this angle; the node stays in the tree at confidence 0.55."
+    },
+    {
+      "node_name": "Data center real estate",
+      "angle": "bottleneck_vs_commodity",
+      "verdict": "strong",
+      "argument": "Data center real estate screens as a chokepoint today, but the relevant question is whether pricing power persists once a second supplier qualifies.",
+      "suggested_change": "",
+      "stance": "held",
+      "rebuttal": "Defense holds under this angle; the node stays in the tree at confidence 0.72."
+    },
+    {
+      "node_name": "Data center real estate",
+      "angle": "priced_in",
+      "verdict": "mixed",
+      "argument": "Consensus on Data center real estate is constructive; the variant view is on duration, not direction.",
+      "suggested_change": "",
+      "stance": "partial",
+      "rebuttal": "Partly conceded. The concern is carried into the memo's 'What we'd have to be wrong about' section; confidence 0.72."
+    },
+    {
+      "node_name": "Data center real estate",
+      "angle": "substitution_risk",
+      "verdict": "strong",
+      "argument": "Data center real estate's substitution path is real but underwritten, three years out is the right horizon, not one.",
+      "suggested_change": "",
+      "stance": "held",
+      "rebuttal": "Defense holds under this angle; the node stays in the tree at confidence 0.72."
+    },
+    {
+      "node_name": "EUV lithography",
+      "angle": "bottleneck_vs_commodity",
+      "verdict": "strong",
+      "argument": "EUV lithography screens as a chokepoint today, but the relevant question is whether pricing power persists once a second supplier qualifies.",
+      "suggested_change": "",
+      "stance": "held",
+      "rebuttal": "Defense holds under this angle; the node stays in the tree at confidence 0.92."
+    },
+    {
+      "node_name": "EUV lithography",
+      "angle": "priced_in",
+      "verdict": "weak",
+      "argument": "Consensus on EUV lithography is constructive; the variant view is on duration, not direction.",
+      "suggested_change": "demote confidence by 0.1",
+      "stance": "conceded",
+      "rebuttal": "Conceded. Skeptic's suggested change: demote confidence by 0.1. Final confidence 0.92."
+    },
+    {
+      "node_name": "EUV lithography",
+      "angle": "substitution_risk",
+      "verdict": "weak",
+      "argument": "EUV lithography's substitution path is real but underwritten, three years out is the right horizon, not one.",
+      "suggested_change": "demote confidence by 0.1",
+      "stance": "conceded",
+      "rebuttal": "Conceded. Skeptic's suggested change: demote confidence by 0.1. Final confidence 0.92."
+    },
+    {
+      "node_name": "Grid interconnection capacity",
+      "angle": "bottleneck_vs_commodity",
+      "verdict": "strong",
+      "argument": "Grid interconnection capacity screens as a chokepoint today, but the relevant question is whether pricing power persists once a second supplier qualifies.",
+      "suggested_change": "",
+      "stance": "held",
+      "rebuttal": "Defense holds under this angle; the node stays in the tree at confidence 0.60."
+    },
+    {
+      "node_name": "Grid interconnection capacity",
+      "angle": "priced_in",
+      "verdict": "mixed",
+      "argument": "Consensus on Grid interconnection capacity is constructive; the variant view is on duration, not direction.",
+      "suggested_change": "",
+      "stance": "partial",
+      "rebuttal": "Partly conceded. The concern is carried into the memo's 'What we'd have to be wrong about' section; confidence 0.60."
+    },
+    {
+      "node_name": "Grid interconnection capacity",
+      "angle": "substitution_risk",
+      "verdict": "weak",
+      "argument": "Grid interconnection capacity's substitution path is real but underwritten, three years out is the right horizon, not one.",
+      "suggested_change": "demote confidence by 0.1",
+      "stance": "conceded",
+      "rebuttal": "Conceded. Skeptic's suggested change: demote confidence by 0.1. Final confidence 0.60."
+    },
+    {
+      "node_name": "HBM memory",
+      "angle": "bottleneck_vs_commodity",
+      "verdict": "weak",
+      "argument": "HBM memory screens as a chokepoint today, but the relevant question is whether pricing power persists once a second supplier qualifies.",
+      "suggested_change": "demote confidence by 0.1",
+      "stance": "conceded",
+      "rebuttal": "Conceded. Skeptic's suggested change: demote confidence by 0.1. Final confidence 0.82."
+    },
+    {
+      "node_name": "HBM memory",
+      "angle": "priced_in",
+      "verdict": "mixed",
+      "argument": "Consensus on HBM memory is constructive; the variant view is on duration, not direction.",
+      "suggested_change": "",
+      "stance": "partial",
+      "rebuttal": "Partly conceded. The concern is carried into the memo's 'What we'd have to be wrong about' section; confidence 0.82."
+    },
+    {
+      "node_name": "HBM memory",
+      "angle": "substitution_risk",
+      "verdict": "weak",
+      "argument": "HBM memory's substitution path is real but underwritten, three years out is the right horizon, not one.",
+      "suggested_change": "demote confidence by 0.1",
+      "stance": "conceded",
+      "rebuttal": "Conceded. Skeptic's suggested change: demote confidence by 0.1. Final confidence 0.82."
+    },
+    {
+      "node_name": "Hyperscaler model hosting",
+      "angle": "bottleneck_vs_commodity",
+      "verdict": "mixed",
+      "argument": "Hyperscaler model hosting screens as a chokepoint today, but the relevant question is whether pricing power persists once a second supplier qualifies.",
+      "suggested_change": "",
+      "stance": "partial",
+      "rebuttal": "Partly conceded. The concern is carried into the memo's 'What we'd have to be wrong about' section; confidence 0.70."
+    },
+    {
+      "node_name": "Hyperscaler model hosting",
+      "angle": "priced_in",
+      "verdict": "strong",
+      "argument": "Consensus on Hyperscaler model hosting is constructive; the variant view is on duration, not direction.",
+      "suggested_change": "",
+      "stance": "held",
+      "rebuttal": "Defense holds under this angle; the node stays in the tree at confidence 0.70."
+    },
+    {
+      "node_name": "Hyperscaler model hosting",
+      "angle": "substitution_risk",
+      "verdict": "strong",
+      "argument": "Hyperscaler model hosting's substitution path is real but underwritten, three years out is the right horizon, not one.",
+      "suggested_change": "",
+      "stance": "held",
+      "rebuttal": "Defense holds under this angle; the node stays in the tree at confidence 0.70."
+    },
+    {
+      "node_name": "Inference at the edge",
+      "angle": "bottleneck_vs_commodity",
+      "verdict": "strong",
+      "argument": "Inference at the edge screens as a chokepoint today, but the relevant question is whether pricing power persists once a second supplier qualifies.",
+      "suggested_change": "",
+      "stance": "held",
+      "rebuttal": "Defense holds under this angle; the node stays in the tree at confidence 0.60."
+    },
+    {
+      "node_name": "Inference at the edge",
+      "angle": "priced_in",
+      "verdict": "strong",
+      "argument": "Consensus on Inference at the edge is constructive; the variant view is on duration, not direction.",
+      "suggested_change": "",
+      "stance": "held",
+      "rebuttal": "Defense holds under this angle; the node stays in the tree at confidence 0.60."
+    },
+    {
+      "node_name": "Inference at the edge",
+      "angle": "substitution_risk",
+      "verdict": "strong",
+      "argument": "Inference at the edge's substitution path is real but underwritten, three years out is the right horizon, not one.",
+      "suggested_change": "",
+      "stance": "held",
+      "rebuttal": "Defense holds under this angle; the node stays in the tree at confidence 0.60."
+    },
+    {
+      "node_name": "Networking silicon & optics",
+      "angle": "bottleneck_vs_commodity",
+      "verdict": "weak",
+      "argument": "Networking silicon & optics screens as a chokepoint today, but the relevant question is whether pricing power persists once a second supplier qualifies.",
+      "suggested_change": "demote confidence by 0.1",
+      "stance": "conceded",
+      "rebuttal": "Conceded. Skeptic's suggested change: demote confidence by 0.1. Final confidence 0.78."
+    },
+    {
+      "node_name": "Networking silicon & optics",
+      "angle": "priced_in",
+      "verdict": "strong",
+      "argument": "Consensus on Networking silicon & optics is constructive; the variant view is on duration, not direction.",
+      "suggested_change": "",
+      "stance": "held",
+      "rebuttal": "Defense holds under this angle; the node stays in the tree at confidence 0.78."
+    },
+    {
+      "node_name": "Networking silicon & optics",
+      "angle": "substitution_risk",
+      "verdict": "weak",
+      "argument": "Networking silicon & optics's substitution path is real but underwritten, three years out is the right horizon, not one.",
+      "suggested_change": "demote confidence by 0.1",
+      "stance": "conceded",
+      "rebuttal": "Conceded. Skeptic's suggested change: demote confidence by 0.1. Final confidence 0.78."
+    },
+    {
+      "node_name": "Power generation & PPAs",
+      "angle": "bottleneck_vs_commodity",
+      "verdict": "mixed",
+      "argument": "Power generation & PPAs screens as a chokepoint today, but the relevant question is whether pricing power persists once a second supplier qualifies.",
+      "suggested_change": "",
+      "stance": "partial",
+      "rebuttal": "Partly conceded. The concern is carried into the memo's 'What we'd have to be wrong about' section; confidence 0.75."
+    },
+    {
+      "node_name": "Power generation & PPAs",
+      "angle": "priced_in",
+      "verdict": "strong",
+      "argument": "Consensus on Power generation & PPAs is constructive; the variant view is on duration, not direction.",
+      "suggested_change": "",
+      "stance": "held",
+      "rebuttal": "Defense holds under this angle; the node stays in the tree at confidence 0.75."
+    },
+    {
+      "node_name": "Power generation & PPAs",
+      "angle": "substitution_risk",
+      "verdict": "strong",
+      "argument": "Power generation & PPAs's substitution path is real but underwritten, three years out is the right horizon, not one.",
+      "suggested_change": "",
+      "stance": "held",
+      "rebuttal": "Defense holds under this angle; the node stays in the tree at confidence 0.75."
+    },
+    {
+      "node_name": "Power, cooling, electrical",
+      "angle": "bottleneck_vs_commodity",
+      "verdict": "mixed",
+      "argument": "Power, cooling, electrical screens as a chokepoint today, but the relevant question is whether pricing power persists once a second supplier qualifies.",
+      "suggested_change": "",
+      "stance": "partial",
+      "rebuttal": "Partly conceded. The concern is carried into the memo's 'What we'd have to be wrong about' section; confidence 0.83."
+    },
+    {
+      "node_name": "Power, cooling, electrical",
+      "angle": "priced_in",
+      "verdict": "weak",
+      "argument": "Consensus on Power, cooling, electrical is constructive; the variant view is on duration, not direction.",
+      "suggested_change": "demote confidence by 0.1",
+      "stance": "conceded",
+      "rebuttal": "Conceded. Skeptic's suggested change: demote confidence by 0.1. Final confidence 0.83."
+    },
+    {
+      "node_name": "Power, cooling, electrical",
+      "angle": "substitution_risk",
+      "verdict": "mixed",
+      "argument": "Power, cooling, electrical's substitution path is real but underwritten, three years out is the right horizon, not one.",
+      "suggested_change": "",
+      "stance": "partial",
+      "rebuttal": "Partly conceded. The concern is carried into the memo's 'What we'd have to be wrong about' section; confidence 0.83."
+    },
+    {
+      "node_name": "Servers & systems integration",
+      "angle": "bottleneck_vs_commodity",
+      "verdict": "strong",
+      "argument": "Servers & systems integration screens as a chokepoint today, but the relevant question is whether pricing power persists once a second supplier qualifies.",
+      "suggested_change": "",
+      "stance": "held",
+      "rebuttal": "Defense holds under this angle; the node stays in the tree at confidence 0.68."
+    },
+    {
+      "node_name": "Servers & systems integration",
+      "angle": "priced_in",
+      "verdict": "mixed",
+      "argument": "Consensus on Servers & systems integration is constructive; the variant view is on duration, not direction.",
+      "suggested_change": "",
+      "stance": "partial",
+      "rebuttal": "Partly conceded. The concern is carried into the memo's 'What we'd have to be wrong about' section; confidence 0.68."
+    },
+    {
+      "node_name": "Servers & systems integration",
+      "angle": "substitution_risk",
+      "verdict": "weak",
+      "argument": "Servers & systems integration's substitution path is real but underwritten, three years out is the right horizon, not one.",
+      "suggested_change": "demote confidence by 0.1",
+      "stance": "conceded",
+      "rebuttal": "Conceded. Skeptic's suggested change: demote confidence by 0.1. Final confidence 0.68."
+    }
+  ],
+  "headline_concerns": [
+    "Accelerator economics: merchant GPU margins compress as ASIC TCO improves at scale.",
+    "Power, not silicon, is the binding constraint for the next leg of AI capex.",
+    "HBM is a 2-supplier oligopoly today, a 3-supplier market by late 2025, pricing fades.",
+    "Hyperscaler ROI on AI capex is still unproven; a single quarter of pullback re-rates the chain.",
+    "Geopolitical export controls on EUV, HBM, and rare earths could fork the global supply chain.",
+    "Edge inference (Apple, Qualcomm) cannibalizes a slice of cloud demand if device-side models hit quality."
+  ],
+  "research": {
+    "queries_run": 18,
+    "unique_urls": 35,
+    "summaries": 35,
+    "search_queries": [
+      "TSMC CoWoS advanced packaging capacity 2026",
+      "HBM3e supply qualification Micron SK Hynix",
+      "EUV lithography ASML High-NA timeline",
+      "AI data center power capacity bottleneck Vertiv Eaton",
+      "Nvidia Blackwell B200 supply chain risks",
+      "AMD MI325X market share inference",
+      "hyperscaler capex 2025 Microsoft Google Amazon Meta",
+      "Broadcom AI custom silicon TPU pricing",
+      "networking 800G optics Marvell Coherent",
+      "data center liquid cooling SMCI Dell",
+      "AI inference at edge Qualcomm Apple silicon",
+      "Arm royalty model AI accelerator design wins",
+      "TSMC 2nm GAA risk Samsung Intel foundry",
+      "rare earths supply China export controls",
+      "AI electricity demand grid interconnection queue",
+      "wafer fab equipment Applied Materials KLA Lam",
+      "AI training cluster economics OpenAI Anthropic",
+      "fiber to data center long-haul Lumen Zayo"
+    ]
+  },
+  "eval": {
+    "judge": "demo stub (canned scores, not a real evaluation)",
+    "scores": {
+      "coverage": {
+        "score": 4,
+        "justification": "Canned demo score. A real rubric score replaces it after the first Claude run."
+      },
+      "specificity": {
+        "score": 4,
+        "justification": "Canned demo score. A real rubric score replaces it after the first Claude run."
+      },
+      "novelty": {
+        "score": 3,
+        "justification": "Canned demo score. A real rubric score replaces it after the first Claude run."
+      },
+      "actionability": {
+        "score": 4,
+        "justification": "Canned demo score. A real rubric score replaces it after the first Claude run."
+      }
+    },
+    "total": 15,
+    "scored_at": "2026-11-08",
+    "hard_checks": {
+      "golden": "evals/golden/ai_infra.yaml",
+      "passed": true,
+      "failures": []
+    }
+  }
+}

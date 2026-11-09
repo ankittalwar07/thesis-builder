@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "updated_at": "2026-11-08T19:36:02Z",
+  "themes": [
+    {
+      "slug": "ai_infrastructure",
+      "theme": "AI infrastructure",
+      "file": "themes/ai_infrastructure.json",
+      "run_date": "2026-11-08",
+      "sample": true,
+      "generated_by": "demo",
+      "nodes": 13,
+      "critiques": 39,
+      "eval_total": 15
+    },
+    {
+      "slug": "energy_transition",
+      "theme": "Energy transition",
+      "file": "themes/energy_transition.json",
+      "run_date": "2026-11-08",
+      "sample": true,
+      "generated_by": "demo",
+      "nodes": 10,
+      "critiques": 30,
+      "eval_total": 15
+    },
+    {
+      "slug": "robotics",
+      "theme": "Robotics",
+      "file": "themes/robotics.json",
+      "run_date": "2026-11-08",
+      "sample": true,
+      "generated_by": "demo",
+      "nodes": 10,
+      "critiques": 30,
+      "eval_total": 15
+    }
+  ]
+}

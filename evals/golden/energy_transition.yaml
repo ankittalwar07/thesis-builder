@@ -1,0 +1,20 @@
+theme: Energy transition
+expected_layers:
+  - raw_inputs
+  - enabling
+  - integrators
+  - applications
+must_mention_any:
+  - cluster: critical_minerals
+    options: [Lithium, ALB, Albemarle, Copper, FCX, Freeport, Cobalt, Nickel]
+  - cluster: batteries
+    options: [CATL, LG Energy, Panasonic, QS, QuantumScape, Tesla, TSLA]
+  - cluster: grid_power_electronics
+    options: [Eaton, ETN, Hubbell, HUBB, Quanta, PWR, Schneider]
+  - cluster: renewables_oem
+    options: [First Solar, FSLR, Enphase, ENPH, SolarEdge, SEDG, Vestas]
+  - cluster: applications
+    options: [EV, Heat pump, HVAC, Carrier, CARR, Trane, TT]
+min_nodes: 8
+min_unique_urls: 25
+min_skeptic_critiques: 3

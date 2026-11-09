@@ -1,0 +1,18 @@
+# Themes the weekly Claude routine researches (routines/weekly-theses.md).
+#
+# Each entry:
+#   theme:  the investment theme, exactly as it should appear in the UI
+#   golden: optional evals/golden/*.yaml spec; its hard requirements are
+#           checked (no LLM) by scripts/validate_thesis.py
+#
+# Output slug = theme lowercased, non-alphanumerics -> "_"
+# ("AI infrastructure" -> ai_infrastructure), same rule as the CLI.
+# Add a theme here and the next scheduled run picks it up.
+
+themes:
+  - theme: AI infrastructure
+    golden: evals/golden/ai_infra.yaml
+  - theme: Energy transition
+    golden: evals/golden/energy_transition.yaml
+  - theme: Robotics
+    golden: evals/golden/robotics.yaml

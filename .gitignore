@@ -1,0 +1,27 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.env
+.env.local
+*.local
+dist/
+build/
+
+outputs/
+.cache/
+.diskcache/
+.diskcache_demo/
+
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+.idea/
+.vscode/
+.DS_Store
+
+# Scratch notes from the scheduled Claude routine (routines/weekly-theses.md)
+work/

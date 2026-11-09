@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Thesis Builder</title>
+  <meta name="description" content="A multi-agent pipeline (Researcher, Skeptic, Synthesizer) that turns an investment theme into a stress-tested value-chain thesis. Runs weekly as a scheduled Claude session." />
+  <link rel="stylesheet" href="style.css" />
+  <script>
+    // Apply a saved light/dark choice before first paint.
+    try {
+      var t = localStorage.getItem("tb-theme");
+      if (t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t);
+    } catch (e) {}
+  </script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="./">
+        <span class="logo" aria-hidden="true">TB</span>
+        <span class="brand-text">
+          <strong>Thesis Builder</strong>
+          <small>Multi-agent value-chain research</small>
+        </span>
+      </a>
+      <nav class="header-nav">
+        <a href="https://github.com/ankittalwar07/thesis-builder" rel="noopener">Source on GitHub</a>
+        <button id="theme-toggle" class="icon-btn" type="button" aria-label="Color theme: auto" title="Color theme: auto">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12 3a9 9 0 1 0 0 18V3z"/><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="hero">
+      <h1>From an investment theme to a stress-tested value chain</h1>
+      <p>
+        Three agents work in sequence. A <strong>Researcher</strong> maps the theme's value chain from
+        cited sources, a <strong>Skeptic</strong> attacks every node from three angles in parallel, and a
+        <strong>Synthesizer</strong> must answer each critique before anything is published. A scheduled
+        Claude session runs the agents every week, so there is no API bill.
+      </p>
+    </section>
+
+    <div id="sample-banner" class="banner" role="status" hidden>
+      <strong>Sample data.</strong> Live theses appear after the first scheduled Claude run.
+    </div>
+
+    <section class="picker" aria-label="Choose a theme">
+      <div id="theme-tabs" class="theme-tabs" role="tablist" aria-label="Themes"></div>
+      <dl id="run-meta" class="run-meta"></dl>
+    </section>
+
+    <div id="load-error" class="banner banner-error" role="alert" hidden></div>
+
+    <section class="card" aria-labelledby="h-pipeline">
+      <div class="card-head">
+        <h2 id="h-pipeline">How this thesis was built</h2>
+        <span class="muted small" id="generated-by"></span>
+      </div>
+      <ol class="pipeline" id="pipeline">
+        <li class="stage stage-input">
+          <span class="stage-kicker">Input</span>
+          <span class="stage-name" id="p-theme">Theme</span>
+          <span class="stage-stat">from routines/themes.yaml</span>
+        </li>
+        <li class="stage">
+          <span class="stage-kicker">Agent 1</span>
+          <span class="stage-name">Researcher</span>
+          <span class="stage-desc">Plans searches per layer, summarizes each source (map), dedups (reduce), audits coverage, drafts the tree.</span>
+          <span class="stage-stat" id="p-research"></span>
+        </li>
+        <li class="stage stage-skeptic">
+          <span class="stage-kicker">Agent 2</span>
+          <span class="stage-name">Skeptic</span>
+          <span class="stage-desc">Attacks every node from three angles in parallel.</span>
+          <span class="angles">
+            <span class="angle-chip">Bottleneck or commodity</span>
+            <span class="angle-chip">Substitution risk</span>
+            <span class="angle-chip">Priced in</span>
+          </span>
+          <span class="stage-stat" id="p-skeptic"></span>
+        </li>
+        <li class="stage">
+          <span class="stage-kicker">Agent 3</span>
+          <span class="stage-name">Synthesizer</span>
+          <span class="stage-desc">Merges research and critiques, adjusts confidence, answers each critique, writes the memo.</span>
+          <span class="stage-stat" id="p-synth"></span>
+        </li>
+        <li class="stage stage-input">
+          <span class="stage-kicker">Checks</span>
+          <span class="stage-name">Validator and judge</span>
+          <span class="stage-desc">Pydantic schema and golden-spec checks (no LLM), then a rubric score.</span>
+          <span class="stage-stat" id="p-eval"></span>
+        </li>
+      </ol>
+    </section>
+
+    <section class="grid-2">
+      <article class="card" aria-labelledby="h-summary">
+        <h2 id="h-summary">Thesis summary</h2>
+        <p id="summary" class="summary"></p>
+        <h3 class="subhead">What would have to be wrong</h3>
+        <ul id="headlines" class="headlines"></ul>
+      </article>
+      <article class="card" aria-labelledby="h-picks">
+        <h2 id="h-picks">Investable picks</h2>
+        <ol id="picks" class="picks"></ol>
+        <p class="muted small">Research output for illustration. Not investment advice.</p>
+      </article>
+    </section>
+
+    <section class="card" aria-labelledby="h-chain">
+      <div class="card-head">
+        <h2 id="h-chain">Value chain</h2>
+        <div class="seg" role="tablist" aria-label="Value chain view">
+          <button type="button" role="tab" class="seg-btn active" data-view="tree" aria-selected="true">Tree</button>
+          <button type="button" role="tab" class="seg-btn" data-view="diagram" aria-selected="false">Diagram</button>
+        </div>
+      </div>
+      <div id="view-tree" class="tree"></div>
+      <div id="view-diagram" class="diagram" hidden>
+        <div id="diagram-out" class="diagram-out"></div>
+      </div>
+    </section>
+
+    <section class="card" aria-labelledby="h-debate">
+      <div class="card-head">
+        <h2 id="h-debate">Skeptic vs. Synthesizer</h2>
+        <div class="filters">
+          <label>Node
+            <select id="f-node"><option value="">All nodes</option></select>
+          </label>
+          <label>Angle
+            <select id="f-angle">
+              <option value="">All angles</option>
+              <option value="bottleneck_vs_commodity">Bottleneck or commodity</option>
+              <option value="substitution_risk">Substitution risk</option>
+              <option value="priced_in">Priced in</option>
+            </select>
+          </label>
+          <label>Answer
+            <select id="f-stance">
+              <option value="">All answers</option>
+              <option value="held">Held</option>
+              <option value="partial">Partly conceded</option>
+              <option value="conceded">Conceded</option>
+            </select>
+          </label>
+        </div>
+      </div>
+      <p class="muted small" id="debate-tally"></p>
+      <div id="debate" class="debate"></div>
+    </section>
+
+    <section class="card" aria-labelledby="h-eval">
+      <div class="card-head">
+        <h2 id="h-eval">Evaluation</h2>
+        <span class="muted small" id="eval-judge"></span>
+      </div>
+      <div id="eval" class="eval"></div>
+    </section>
+
+    <section class="card">
+      <details class="memo-details">
+        <summary><h2>Full memo</h2><span class="muted small">Synthesizer output, markdown</span></summary>
+        <article id="memo" class="memo"></article>
+      </details>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p><strong>Not investment advice.</strong> This page shows the output of an automated research
+        pipeline built as an engineering demo. It may be incomplete or wrong. Do your own research.</p>
+      <p>Built by Ankit Talwar.
+        <a href="https://github.com/ankittalwar07/thesis-builder" rel="noopener">Source and architecture</a>.
+        More multi-agent work:
+        <a href="https://ankittalwar07.github.io/Multi-agent-AI-investment-agent/" rel="noopener">Multi-agent AI investment agent</a>,
+        <a href="https://ankittalwar07.github.io/warning-signaks-for-AI-economy-/" rel="noopener">AI Demand Watch</a>.
+      </p>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

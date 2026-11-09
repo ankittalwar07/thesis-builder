@@ -1,0 +1,20 @@
+theme: Robotics
+expected_layers:
+  - raw_inputs
+  - enabling
+  - integrators
+  - applications
+must_mention_any:
+  - cluster: actuators_motors
+    options: [Harmonic Drive, Nidec, NJ, Maxon, Moog]
+  - cluster: sensors_vision
+    options: [Sony, Cognex, CGNX, Keyence, Hesai, HSAI, Luminar, LAZR]
+  - cluster: compute
+    options: [NVDA, NVIDIA, Qualcomm, QCOM]
+  - cluster: integrators
+    options: [ABB, Fanuc, KUKA, Yaskawa, Boston Dynamics, Tesla, TSLA]
+  - cluster: applications
+    options: [Amazon, AMZN, Symbotic, SYM, Intuitive Surgical, ISRG]
+min_nodes: 8
+min_unique_urls: 25
+min_skeptic_critiques: 3

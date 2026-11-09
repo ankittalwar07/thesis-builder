@@ -1,0 +1,582 @@
+{
+  "schema_version": 1,
+  "slug": "robotics",
+  "theme": "Robotics",
+  "run_date": "2026-11-08",
+  "sample": true,
+  "generated_by": "demo",
+  "thesis": {
+    "theme": "Robotics",
+    "summary": "Robotics is a barbell: surgical and warehouse automation are real businesses today (ISRG, SYM, Amazon's internal fleet), while humanoids remain narrative-driven. The picks-and-shovels layer (vision, gearing, motors) is the most defensible exposure for the next 24 months. Vertical integration by Tesla and Figure is the biggest threat to the actuator suppliers; China's dominance of the magnet/motor chain is the biggest macro risk.",
+    "nodes": [
+      {
+        "name": "Rare-earth magnets & specialty materials",
+        "layer": "raw_inputs",
+        "description": "Dysprosium/samarium for high-density permanent-magnet motors used in actuators.",
+        "public_names": [],
+        "private_names": [],
+        "catalysts": [
+          "China export curbs"
+        ],
+        "risks": [
+          "Ferrite substitution"
+        ],
+        "sources": [
+          "https://www.example.com/r/ree-motors",
+          "https://www.example.com/r/optimus-bom"
+        ],
+        "confidence": 0.6
+      },
+      {
+        "name": "Precision gearing (harmonic, cycloidal)",
+        "layer": "enabling",
+        "description": "Strain-wave reducers are the chokepoint for high-DOF robot joints.",
+        "public_names": [],
+        "private_names": [
+          "Harmonic Drive Systems"
+        ],
+        "catalysts": [
+          "Humanoid prototypes pull demand"
+        ],
+        "risks": [
+          "New gearing designs from US/EU startups"
+        ],
+        "sources": [
+          "https://www.example.com/r/harmonic"
+        ],
+        "confidence": 0.78
+      },
+      {
+        "name": "Motors & actuators",
+        "layer": "enabling",
+        "description": "Nidec and Maxon supply high-density motors for industrial and humanoid platforms.",
+        "public_names": [],
+        "private_names": [
+          "Nidec",
+          "Maxon",
+          "Moog"
+        ],
+        "catalysts": [
+          "Humanoid build ramp"
+        ],
+        "risks": [
+          "Vertical integration by TSLA/Figure"
+        ],
+        "sources": [
+          "https://www.example.com/r/nidec"
+        ],
+        "confidence": 0.7
+      },
+      {
+        "name": "Vision & sensing",
+        "layer": "enabling",
+        "description": "Cognex (industrial), Keyence (factory), Sony (CIS), Hesai/Luminar (lidar).",
+        "public_names": [
+          "CGNX",
+          "HSAI",
+          "LAZR"
+        ],
+        "private_names": [
+          "Keyence",
+          "Sony"
+        ],
+        "catalysts": [
+          "AI-first vision systems"
+        ],
+        "risks": [
+          "Commoditization of lidar"
+        ],
+        "sources": [
+          "https://www.example.com/r/cgnx",
+          "https://www.example.com/r/keyence",
+          "https://www.example.com/r/hsai"
+        ],
+        "confidence": 0.74
+      },
+      {
+        "name": "Compute & foundation models",
+        "layer": "enabling",
+        "description": "Nvidia Isaac/GR00T as the platform layer for humanoid policy pretraining.",
+        "public_names": [
+          "NVDA"
+        ],
+        "private_names": [],
+        "catalysts": [
+          "GR00T model releases"
+        ],
+        "risks": [
+          "Open-source alternatives"
+        ],
+        "sources": [
+          "https://www.example.com/r/isaac"
+        ],
+        "confidence": 0.66
+      },
+      {
+        "name": "Industrial robot OEMs",
+        "layer": "integrators",
+        "description": "Fanuc, ABB, Yaskawa, KUKA, incumbent franchise with cycle leverage.",
+        "public_names": [],
+        "private_names": [
+          "Fanuc",
+          "ABB",
+          "Yaskawa",
+          "KUKA"
+        ],
+        "catalysts": [
+          "Cycle inflection"
+        ],
+        "risks": [
+          "China onshoring share gains"
+        ],
+        "sources": [
+          "https://www.example.com/r/fanuc",
+          "https://www.example.com/r/abb-amr",
+          "https://www.example.com/r/yaskawa"
+        ],
+        "confidence": 0.7
+      },
+      {
+        "name": "Humanoids",
+        "layer": "integrators",
+        "description": "Tesla Optimus, Figure, Boston Dynamics, Unitree; capability-cost frontier is moving fast.",
+        "public_names": [
+          "TSLA"
+        ],
+        "private_names": [
+          "Figure",
+          "Boston Dynamics",
+          "Unitree"
+        ],
+        "catalysts": [
+          "BMW Figure deployment",
+          "Optimus 2025 build"
+        ],
+        "risks": [
+          "Demonstrations vs. revenue gap"
+        ],
+        "sources": [
+          "https://www.example.com/r/figure-bmw",
+          "https://www.example.com/r/optimus-target",
+          "https://www.example.com/r/unitree"
+        ],
+        "confidence": 0.55
+      },
+      {
+        "name": "Warehouse automation",
+        "layer": "applications",
+        "description": "Symbotic (Walmart), Amazon robotics, Boston Dynamics Stretch at GXO.",
+        "public_names": [
+          "SYM",
+          "AMZN"
+        ],
+        "private_names": [
+          "Boston Dynamics"
+        ],
+        "catalysts": [
+          "Symbotic $23B backlog"
+        ],
+        "risks": [
+          "Customer concentration (Walmart)"
+        ],
+        "sources": [
+          "https://www.example.com/r/sym",
+          "https://www.example.com/r/amzn-robots",
+          "https://www.example.com/r/bdyn-gxo"
+        ],
+        "confidence": 0.7
+      },
+      {
+        "name": "Surgical robotics",
+        "layer": "applications",
+        "description": "Intuitive Surgical's da Vinci 5 cycle plus razor/blade instrument economics.",
+        "public_names": [
+          "ISRG"
+        ],
+        "private_names": [],
+        "catalysts": [
+          "da Vinci 5 ramp"
+        ],
+        "risks": [
+          "Competition from Medtronic Hugo"
+        ],
+        "sources": [
+          "https://www.example.com/r/isrg"
+        ],
+        "confidence": 0.78
+      },
+      {
+        "name": "Mobility / robotaxi",
+        "layer": "applications",
+        "description": "Autonomous-vehicle programs depend on sensor + compute pipelines from same supply chain.",
+        "public_names": [
+          "TSLA"
+        ],
+        "private_names": [
+          "Waymo",
+          "Cruise"
+        ],
+        "catalysts": [
+          "Lidar BOM cost decline"
+        ],
+        "risks": [
+          "Regulation in US/EU"
+        ],
+        "sources": [
+          "https://www.example.com/r/hsai",
+          "https://www.example.com/r/lazr"
+        ],
+        "confidence": 0.5
+      }
+    ],
+    "investable_picks": [
+      "ISRG: best risk-adjusted exposure to robotics today: monopoly razor/blade economics in surgical automation.",
+      "SYM: concentrated Walmart bet, but the backlog is real and the tech is in production.",
+      "CGNX: picks-and-shovels for any robotics build-out; cycle inflection ahead.",
+      "NVDA: Isaac/GR00T compounds the AI-infra bet into the robotics stack.",
+      "HSAI: lidar BOM owner with diversified Chinese OEM wins; cheap on volume scaling."
+    ],
+    "skeptic_notes": [
+      "Humanoid demos remain demos; revenue inflection is still 2027+ on any honest analysis.",
+      "Industrial robotics is cyclical first, secular second, don't pay for secular at cycle highs.",
+      "Vertical integration risk: TSLA and Figure could absorb most actuator value internally.",
+      "China supplies the magnets, the motors, and increasingly the humanoid platforms themselves.",
+      "Lidar is commoditizing, diversification across programs matters more than tech leadership."
+    ],
+    "generated_at": "2026-11-08T19:36:02.013284Z"
+  },
+  "memo_md": "# Robotics: Value Chain Thesis\n\n## Summary\n\nRobotics is a barbell: surgical and warehouse automation are real businesses today (ISRG, SYM, Amazon's internal fleet), while humanoids remain narrative-driven. The picks-and-shovels layer (vision, gearing, motors) is the most defensible exposure for the next 24 months. Vertical integration by Tesla and Figure is the biggest threat to the actuator suppliers; China's dominance of the magnet/motor chain is the biggest macro risk.\n\n## Value chain\n\n### Raw inputs\n\n- **Rare-earth magnets & specialty materials** (, ), Dysprosium/samarium for high-density permanent-magnet motors used in actuators.\n\n### Enabling layer\n\n- **Precision gearing (harmonic, cycloidal)** (, ), Strain-wave reducers are the chokepoint for high-DOF robot joints.\n- **Motors & actuators** (, ), Nidec and Maxon supply high-density motors for industrial and humanoid platforms.\n- **Vision & sensing** (CGNX, HSAI, LAZR), Cognex (industrial), Keyence (factory), Sony (CIS), Hesai/Luminar (lidar).\n- **Compute & foundation models** (NVDA), Nvidia Isaac/GR00T as the platform layer for humanoid policy pretraining.\n\n### Integrators\n\n- **Industrial robot OEMs** (, ), Fanuc, ABB, Yaskawa, KUKA, incumbent franchise with cycle leverage.\n- **Humanoids** (TSLA), Tesla Optimus, Figure, Boston Dynamics, Unitree; capability-cost frontier is moving fast.\n\n### Applications\n\n- **Warehouse automation** (SYM, AMZN), Symbotic (Walmart), Amazon robotics, Boston Dynamics Stretch at GXO.\n- **Surgical robotics** (ISRG), Intuitive Surgical's da Vinci 5 cycle plus razor/blade instrument economics.\n- **Mobility / robotaxi** (TSLA), Autonomous-vehicle programs depend on sensor + compute pipelines from same supply chain.\n\n## Investable picks\n\n1. ISRG, best risk-adjusted exposure to robotics today: monopoly razor/blade economics in surgical automation.\n2. SYM, concentrated Walmart bet, but the backlog is real and the tech is in production.\n3. CGNX, picks-and-shovels for any robotics build-out; cycle inflection ahead.\n4. NVDA, Isaac/GR00T compounds the AI-infra bet into the robotics stack.\n5. HSAI, lidar BOM owner with diversified Chinese OEM wins; cheap on volume scaling.\n\n## What we'd have to be wrong about\n\n- Humanoid demos remain demos; revenue inflection is still 2027+ on any honest analysis.\n- Industrial robotics is cyclical first, secular second, don't pay for secular at cycle highs.\n- Vertical integration risk: TSLA and Figure could absorb most actuator value internally.\n- China supplies the magnets, the motors, and increasingly the humanoid platforms themselves.\n- Lidar is commoditizing, diversification across programs matters more than tech leadership.\n\n## Sources\n\n- https://www.example.com/r/abb-amr\n- https://www.example.com/r/amzn-robots\n- https://www.example.com/r/bdyn-gxo\n- https://www.example.com/r/cgnx\n- https://www.example.com/r/fanuc\n- https://www.example.com/r/figure-bmw\n- https://www.example.com/r/harmonic\n- https://www.example.com/r/hsai\n- https://www.example.com/r/isaac\n- https://www.example.com/r/isrg\n- https://www.example.com/r/keyence\n- https://www.example.com/r/lazr\n- https://www.example.com/r/nidec\n- https://www.example.com/r/optimus-bom\n- https://www.example.com/r/optimus-target\n- https://www.example.com/r/ree-motors\n- https://www.example.com/r/sym\n- https://www.example.com/r/unitree\n- https://www.example.com/r/yaskawa",
+  "diagram_mmd": "graph LR\n  subgraph raw[Raw inputs]\n    r1[\"Rare-earth magnets<br/>(China supply)\"]\n  end\n  subgraph enabling[Enabling]\n    e1[\"Precision gearing<br/>Harmonic Drive\"]\n    e2[\"Motors & actuators<br/>Nidec, Maxon\"]\n    e3[\"Vision & sensing<br/>CGNX, Keyence, HSAI\"]\n    e4[\"Compute / models<br/>NVDA Isaac\"]\n  end\n  subgraph integrators[Integrators]\n    i1[\"Industrial OEMs<br/>Fanuc, ABB, Yaskawa\"]\n    i2[\"Humanoids<br/>TSLA, Figure, Unitree\"]\n  end\n  subgraph applications[Applications]\n    a1[\"Warehouse<br/>SYM, AMZN\"]\n    a2[\"Surgical<br/>ISRG\"]\n    a3[\"Mobility<br/>TSLA, Waymo\"]\n  end\n  r1 --> e2\n  e1 --> i2\n  e2 --> i1\n  e2 --> i2\n  e3 --> i1\n  e3 --> a3\n  e4 --> i2\n  i1 --> a1\n  i2 --> a1\n  i2 --> a2",
+  "critiques": [
+    {
+      "node_name": "Compute & foundation models",
+      "angle": "bottleneck_vs_commodity",
+      "verdict": "strong",
+      "argument": "Compute & foundation models screens as a chokepoint today, but the relevant question is whether pricing power persists once a second supplier qualifies.",
+      "suggested_change": "",
+      "stance": "held",
+      "rebuttal": "Defense holds under this angle; the node stays in the tree at confidence 0.66."
+    },
+    {
+      "node_name": "Compute & foundation models",
+      "angle": "priced_in",
+      "verdict": "mixed",
+      "argument": "Consensus on Compute & foundation models is constructive; the variant view is on duration, not direction.",
+      "suggested_change": "",
+      "stance": "partial",
+      "rebuttal": "Partly conceded. The concern is carried into the memo's 'What we'd have to be wrong about' section; confidence 0.66."
+    },
+    {
+      "node_name": "Compute & foundation models",
+      "angle": "substitution_risk",
+      "verdict": "strong",
+      "argument": "Compute & foundation models's substitution path is real but underwritten, three years out is the right horizon, not one.",
+      "suggested_change": "",
+      "stance": "held",
+      "rebuttal": "Defense holds under this angle; the node stays in the tree at confidence 0.66."
+    },
+    {
+      "node_name": "Humanoids",
+      "angle": "bottleneck_vs_commodity",
+      "verdict": "strong",
+      "argument": "Humanoids screens as a chokepoint today, but the relevant question is whether pricing power persists once a second supplier qualifies.",
+      "suggested_change": "",
+      "stance": "held",
+      "rebuttal": "Defense holds under this angle; the node stays in the tree at confidence 0.55."
+    },
+    {
+      "node_name": "Humanoids",
+      "angle": "priced_in",
+      "verdict": "strong",
+      "argument": "Consensus on Humanoids is constructive; the variant view is on duration, not direction.",
+      "suggested_change": "",
+      "stance": "held",
+      "rebuttal": "Defense holds under this angle; the node stays in the tree at confidence 0.55."
+    },
+    {
+      "node_name": "Humanoids",
+      "angle": "substitution_risk",
+      "verdict": "strong",
+      "argument": "Humanoids's substitution path is real but underwritten, three years out is the right horizon, not one.",
+      "suggested_change": "",
+      "stance": "held",
+      "rebuttal": "Defense holds under this angle; the node stays in the tree at confidence 0.55."
+    },
+    {
+      "node_name": "Industrial robot OEMs",
+      "angle": "bottleneck_vs_commodity",
+      "verdict": "mixed",
+      "argument": "Industrial robot OEMs screens as a chokepoint today, but the relevant question is whether pricing power persists once a second supplier qualifies.",
+      "suggested_change": "",
+      "stance": "partial",
+      "rebuttal": "Partly conceded. The concern is carried into the memo's 'What we'd have to be wrong about' section; confidence 0.70."
+    },
+    {
+      "node_name": "Industrial robot OEMs",
+      "angle": "priced_in",
+      "verdict": "weak",
+      "argument": "Consensus on Industrial robot OEMs is constructive; the variant view is on duration, not direction.",
+      "suggested_change": "demote confidence by 0.1",
+      "stance": "conceded",
+      "rebuttal": "Conceded. Skeptic's suggested change: demote confidence by 0.1. Final confidence 0.70."
+    },
+    {
+      "node_name": "Industrial robot OEMs",
+      "angle": "substitution_risk",
+      "verdict": "mixed",
+      "argument": "Industrial robot OEMs's substitution path is real but underwritten, three years out is the right horizon, not one.",
+      "suggested_change": "",
+      "stance": "partial",
+      "rebuttal": "Partly conceded. The concern is carried into the memo's 'What we'd have to be wrong about' section; confidence 0.70."
+    },
+    {
+      "node_name": "Mobility / robotaxi",
+      "angle": "bottleneck_vs_commodity",
+      "verdict": "mixed",
+      "argument": "Mobility / robotaxi screens as a chokepoint today, but the relevant question is whether pricing power persists once a second supplier qualifies.",
+      "suggested_change": "",
+      "stance": "partial",
+      "rebuttal": "Partly conceded. The concern is carried into the memo's 'What we'd have to be wrong about' section; confidence 0.50."
+    },
+    {
+      "node_name": "Mobility / robotaxi",
+      "angle": "priced_in",
+      "verdict": "weak",
+      "argument": "Consensus on Mobility / robotaxi is constructive; the variant view is on duration, not direction.",
+      "suggested_change": "demote confidence by 0.1",
+      "stance": "conceded",
+      "rebuttal": "Conceded. Skeptic's suggested change: demote confidence by 0.1. Final confidence 0.50."
+    },
+    {
+      "node_name": "Mobility / robotaxi",
+      "angle": "substitution_risk",
+      "verdict": "weak",
+      "argument": "Mobility / robotaxi's substitution path is real but underwritten, three years out is the right horizon, not one.",
+      "suggested_change": "demote confidence by 0.1",
+      "stance": "conceded",
+      "rebuttal": "Conceded. Skeptic's suggested change: demote confidence by 0.1. Final confidence 0.50."
+    },
+    {
+      "node_name": "Motors & actuators",
+      "angle": "bottleneck_vs_commodity",
+      "verdict": "strong",
+      "argument": "Motors & actuators screens as a chokepoint today, but the relevant question is whether pricing power persists once a second supplier qualifies.",
+      "suggested_change": "",
+      "stance": "held",
+      "rebuttal": "Defense holds under this angle; the node stays in the tree at confidence 0.70."
+    },
+    {
+      "node_name": "Motors & actuators",
+      "angle": "priced_in",
+      "verdict": "weak",
+      "argument": "Consensus on Motors & actuators is constructive; the variant view is on duration, not direction.",
+      "suggested_change": "demote confidence by 0.1",
+      "stance": "conceded",
+      "rebuttal": "Conceded. Skeptic's suggested change: demote confidence by 0.1. Final confidence 0.70."
+    },
+    {
+      "node_name": "Motors & actuators",
+      "angle": "substitution_risk",
+      "verdict": "mixed",
+      "argument": "Motors & actuators's substitution path is real but underwritten, three years out is the right horizon, not one.",
+      "suggested_change": "",
+      "stance": "partial",
+      "rebuttal": "Partly conceded. The concern is carried into the memo's 'What we'd have to be wrong about' section; confidence 0.70."
+    },
+    {
+      "node_name": "Precision gearing (harmonic, cycloidal)",
+      "angle": "bottleneck_vs_commodity",
+      "verdict": "strong",
+      "argument": "Precision gearing (harmonic, cycloidal) screens as a chokepoint today, but the relevant question is whether pricing power persists once a second supplier qualifies.",
+      "suggested_change": "",
+      "stance": "held",
+      "rebuttal": "Defense holds under this angle; the node stays in the tree at confidence 0.78."
+    },
+    {
+      "node_name": "Precision gearing (harmonic, cycloidal)",
+      "angle": "priced_in",
+      "verdict": "strong",
+      "argument": "Consensus on Precision gearing (harmonic, cycloidal) is constructive; the variant view is on duration, not direction.",
+      "suggested_change": "",
+      "stance": "held",
+      "rebuttal": "Defense holds under this angle; the node stays in the tree at confidence 0.78."
+    },
+    {
+      "node_name": "Precision gearing (harmonic, cycloidal)",
+      "angle": "substitution_risk",
+      "verdict": "weak",
+      "argument": "Precision gearing (harmonic, cycloidal)'s substitution path is real but underwritten, three years out is the right horizon, not one.",
+      "suggested_change": "demote confidence by 0.1",
+      "stance": "conceded",
+      "rebuttal": "Conceded. Skeptic's suggested change: demote confidence by 0.1. Final confidence 0.78."
+    },
+    {
+      "node_name": "Rare-earth magnets & specialty materials",
+      "angle": "bottleneck_vs_commodity",
+      "verdict": "mixed",
+      "argument": "Rare-earth magnets & specialty materials screens as a chokepoint today, but the relevant question is whether pricing power persists once a second supplier qualifies.",
+      "suggested_change": "",
+      "stance": "partial",
+      "rebuttal": "Partly conceded. The concern is carried into the memo's 'What we'd have to be wrong about' section; confidence 0.60."
+    },
+    {
+      "node_name": "Rare-earth magnets & specialty materials",
+      "angle": "priced_in",
+      "verdict": "strong",
+      "argument": "Consensus on Rare-earth magnets & specialty materials is constructive; the variant view is on duration, not direction.",
+      "suggested_change": "",
+      "stance": "held",
+      "rebuttal": "Defense holds under this angle; the node stays in the tree at confidence 0.60."
+    },
+    {
+      "node_name": "Rare-earth magnets & specialty materials",
+      "angle": "substitution_risk",
+      "verdict": "mixed",
+      "argument": "Rare-earth magnets & specialty materials's substitution path is real but underwritten, three years out is the right horizon, not one.",
+      "suggested_change": "",
+      "stance": "partial",
+      "rebuttal": "Partly conceded. The concern is carried into the memo's 'What we'd have to be wrong about' section; confidence 0.60."
+    },
+    {
+      "node_name": "Surgical robotics",
+      "angle": "bottleneck_vs_commodity",
+      "verdict": "strong",
+      "argument": "Surgical robotics screens as a chokepoint today, but the relevant question is whether pricing power persists once a second supplier qualifies.",
+      "suggested_change": "",
+      "stance": "held",
+      "rebuttal": "Defense holds under this angle; the node stays in the tree at confidence 0.78."
+    },
+    {
+      "node_name": "Surgical robotics",
+      "angle": "priced_in",
+      "verdict": "strong",
+      "argument": "Consensus on Surgical robotics is constructive; the variant view is on duration, not direction.",
+      "suggested_change": "",
+      "stance": "held",
+      "rebuttal": "Defense holds under this angle; the node stays in the tree at confidence 0.78."
+    },
+    {
+      "node_name": "Surgical robotics",
+      "angle": "substitution_risk",
+      "verdict": "mixed",
+      "argument": "Surgical robotics's substitution path is real but underwritten, three years out is the right horizon, not one.",
+      "suggested_change": "",
+      "stance": "partial",
+      "rebuttal": "Partly conceded. The concern is carried into the memo's 'What we'd have to be wrong about' section; confidence 0.78."
+    },
+    {
+      "node_name": "Vision & sensing",
+      "angle": "bottleneck_vs_commodity",
+      "verdict": "mixed",
+      "argument": "Vision & sensing screens as a chokepoint today, but the relevant question is whether pricing power persists once a second supplier qualifies.",
+      "suggested_change": "",
+      "stance": "partial",
+      "rebuttal": "Partly conceded. The concern is carried into the memo's 'What we'd have to be wrong about' section; confidence 0.74."
+    },
+    {
+      "node_name": "Vision & sensing",
+      "angle": "priced_in",
+      "verdict": "strong",
+      "argument": "Consensus on Vision & sensing is constructive; the variant view is on duration, not direction.",
+      "suggested_change": "",
+      "stance": "held",
+      "rebuttal": "Defense holds under this angle; the node stays in the tree at confidence 0.74."
+    },
+    {
+      "node_name": "Vision & sensing",
+      "angle": "substitution_risk",
+      "verdict": "mixed",
+      "argument": "Vision & sensing's substitution path is real but underwritten, three years out is the right horizon, not one.",
+      "suggested_change": "",
+      "stance": "partial",
+      "rebuttal": "Partly conceded. The concern is carried into the memo's 'What we'd have to be wrong about' section; confidence 0.74."
+    },
+    {
+      "node_name": "Warehouse automation",
+      "angle": "bottleneck_vs_commodity",
+      "verdict": "mixed",
+      "argument": "Warehouse automation screens as a chokepoint today, but the relevant question is whether pricing power persists once a second supplier qualifies.",
+      "suggested_change": "",
+      "stance": "partial",
+      "rebuttal": "Partly conceded. The concern is carried into the memo's 'What we'd have to be wrong about' section; confidence 0.70."
+    },
+    {
+      "node_name": "Warehouse automation",
+      "angle": "priced_in",
+      "verdict": "strong",
+      "argument": "Consensus on Warehouse automation is constructive; the variant view is on duration, not direction.",
+      "suggested_change": "",
+      "stance": "held",
+      "rebuttal": "Defense holds under this angle; the node stays in the tree at confidence 0.70."
+    },
+    {
+      "node_name": "Warehouse automation",
+      "angle": "substitution_risk",
+      "verdict": "strong",
+      "argument": "Warehouse automation's substitution path is real but underwritten, three years out is the right horizon, not one.",
+      "suggested_change": "",
+      "stance": "held",
+      "rebuttal": "Defense holds under this angle; the node stays in the tree at confidence 0.70."
+    }
+  ],
+  "headline_concerns": [
+    "Humanoid demos remain demos; revenue inflection is still 2027+ on any honest analysis.",
+    "Industrial robotics is cyclical first, secular second, don't pay for secular at cycle highs.",
+    "Vertical integration risk: TSLA and Figure could absorb most actuator value internally.",
+    "China supplies the magnets, the motors, and increasingly the humanoid platforms themselves.",
+    "Lidar is commoditizing, diversification across programs matters more than tech leadership."
+  ],
+  "research": {
+    "queries_run": 16,
+    "unique_urls": 19,
+    "summaries": 19,
+    "search_queries": [
+      "harmonic drive strain wave gearing market share Nidec",
+      "humanoid robot bill of materials Tesla Optimus Figure",
+      "Cognex machine vision market share factory automation",
+      "Fanuc ABB Yaskawa industrial robot orders 2026",
+      "Boston Dynamics Stretch warehouse deployments",
+      "Hesai Luminar lidar robotaxi BOM",
+      "Nvidia Isaac robotics platform adoption",
+      "Symbotic warehouse automation orders Walmart",
+      "Intuitive Surgical da Vinci 5 launch",
+      "Amazon robotics fulfillment capex",
+      "ABB AMR Mobile robot acquisition strategy",
+      "China humanoid robot Unitree Xiaomi",
+      "force-torque sensor supply chain ATI",
+      "robot dexterity end-effector startups",
+      "Boston Dynamics Atlas commercialization",
+      "rare earth magnet supply for robotic motors"
+    ]
+  },
+  "eval": {
+    "judge": "demo stub (canned scores, not a real evaluation)",
+    "scores": {
+      "coverage": {
+        "score": 4,
+        "justification": "Canned demo score. A real rubric score replaces it after the first Claude run."
+      },
+      "specificity": {
+        "score": 4,
+        "justification": "Canned demo score. A real rubric score replaces it after the first Claude run."
+      },
+      "novelty": {
+        "score": 3,
+        "justification": "Canned demo score. A real rubric score replaces it after the first Claude run."
+      },
+      "actionability": {
+        "score": 4,
+        "justification": "Canned demo score. A real rubric score replaces it after the first Claude run."
+      }
+    },
+    "total": 15,
+    "scored_at": "2026-11-08",
+    "hard_checks": {
+      "golden": "evals/golden/robotics.yaml",
+      "passed": false,
+      "failures": [
+        "only 19 unique URLs (need >= 25)"
+      ]
+    }
+  }
+}
