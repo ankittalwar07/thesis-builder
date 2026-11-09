@@ -38,9 +38,14 @@
       return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
     });
   }
+  // Sample data cites placeholder hosts; never render those as live links.
+  function isPlaceholder(u) {
+    try { return /(^|\.)example\.(com|org|net)$/i.test(new URL(String(u)).hostname); } catch (e) { return false; }
+  }
   function safeUrl(u) {
     try {
       var url = new URL(String(u));
+      if (isPlaceholder(url.href)) return null;
       return url.protocol === "https:" || url.protocol === "http:" ? url.href : null;
     } catch (e) { return null; }
   }
@@ -248,6 +253,7 @@
       .join("");
     var sources = (n.sources || []).map(function (u) {
       var s = safeUrl(u);
+      if (!s && isPlaceholder(u)) return '<span class="muted">sample source</span>';
       return s ? '<a href="' + esc(s) + '" rel="noopener nofollow" target="_blank">' + esc(host(s)) + "</a>" : "";
     }).filter(Boolean).join(", ");
     var verdicts = crit.map(function (c) {

@@ -9,7 +9,7 @@ tier-reasoning:
 Each critique gets a small evidence pack drawn from the source summaries
 most relevant to that node (entity-overlap + relevance). After the per-node
 fan-out, a single rollup call (also tier-reasoning) condenses the critiques
-into 3–6 headline concerns for the memo.
+into 3 to 6 headline concerns for the memo.
 """
 
 from __future__ import annotations

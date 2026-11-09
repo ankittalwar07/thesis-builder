@@ -10,7 +10,7 @@ Pipeline per round:
      queue follow-up queries and loop.
 
 Final step builds a draft Node tree with tier-reasoning. Raw HTML is never
-carried forward in working context — only the compressed ``SourceSummary``
+carried forward in working context, only the compressed ``SourceSummary``
 list is.
 """
 
@@ -123,7 +123,7 @@ class Researcher:
         n_queries: int,
         summaries: list[SourceSummary],
     ) -> QueryPlan:
-        prior = _coverage_block(summaries) if summaries else "(none yet — this is the first round)"
+        prior = _coverage_block(summaries) if summaries else "(none yet, this is the first round)"
         msgs = [
             {"role": "system", "content": prompts.get("planner_system")},
             {
@@ -190,7 +190,7 @@ class Researcher:
     ) -> SourceSummary | None:
         content = fetch_source(str(result.url), self.cache, trace=self.llm.trace)
         if not content:
-            # Fall back to the snippet — useful when a site blocks scrapers.
+            # Fall back to the snippet, useful when a site blocks scrapers.
             content = result.snippet
             if not content:
                 return None

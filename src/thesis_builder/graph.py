@@ -7,7 +7,7 @@ plain ``TypedDict`` (LangGraph's native style) carrying the bundle / report
 Before the synthesizer (the most expensive call), we measure the user-prompt
 context size with tiktoken; if it exceeds the configured budget we trim the
 researcher's source summaries by recency × relevance until it fits. Token
-budgets for researcher / skeptic are advisory — those agents already chunk
+budgets for researcher / skeptic are advisory, those agents already chunk
 their inputs internally.
 """
 
@@ -46,7 +46,7 @@ def build_graph(
     def research_node(state: ThesisState) -> ThesisState:
         bundle = researcher.run(state["theme"])
         # Even though the researcher chunks its inputs, cap how much we hand
-        # to downstream agents at the synthesizer budget — skeptic / synthesizer
+        # to downstream agents at the synthesizer budget, skeptic / synthesizer
         # would otherwise burn cost on duplicative low-relevance summaries.
         trimmed = _trim_summaries(
             bundle.summaries,
@@ -140,7 +140,7 @@ def _dump_summaries(summaries: list[SourceSummary]) -> str:
 def _estimate_overhead(theme: str) -> int:
     """Token overhead from system prompt + skeptic block + draft tree block.
 
-    Rough constant — within 20% is fine for the trim heuristic.
+    Rough constant, within 20% is fine for the trim heuristic.
     """
     return 4000 + _token_estimate(theme)
 
@@ -152,7 +152,7 @@ def _trim_summaries(
 ) -> list[SourceSummary]:
     """Drop the lowest-relevance summaries until the dump fits.
 
-    "Recency + relevance" per the brief — researcher emits summaries in
+    "Recency + relevance" per the brief, researcher emits summaries in
     discovery order, so original ordering already encodes recency. We keep
     that order for ties but score by relevance first.
     """

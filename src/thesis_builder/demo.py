@@ -3,7 +3,7 @@
 Lets you run the full real graph end-to-end with no API keys, no network.
 Useful for the web UI, smoke tests, and architectural review.
 
-Architecture is identical to a live run — the real Researcher, Skeptic,
+Architecture is identical to a live run: the real Researcher, Skeptic,
 Synthesizer, and LangGraph code execute. Only the leaf LLM calls and
 web-search results are stubbed. Trace events still flow through the real
 ``TraceWriter`` so the metrics UI shows realistic-looking numbers.
@@ -117,7 +117,7 @@ def _ai_infra_pack() -> _ThemePack:
         {"name": "Advanced packaging (CoWoS)", "layer": "enabling", "description": "TSMC CoWoS capacity is the binding constraint for Blackwell-class accelerators.", "public_names": ["TSM"], "private_names": [], "catalysts": ["CoWoS capacity 2x by EOY 2025"], "risks": ["Yield on next-gen substrates"], "sources": ["https://www.example.com/ai/tsmc-cowos"], "confidence": 0.9},
         {"name": "HBM memory", "layer": "enabling", "description": "SK Hynix is the volume leader; Micron is the marginal supplier with the largest upside.", "public_names": ["MU"], "private_names": ["SK Hynix"], "catalysts": ["Micron qualified at Nvidia"], "risks": ["Samsung qualification could pressure pricing"], "sources": ["https://www.example.com/ai/micron-hbm"], "confidence": 0.82},
         {"name": "Networking silicon & optics", "layer": "enabling", "description": "Switch ASICs and DSP/VCSEL optics; tightly coupled to scale-up cluster sizes.", "public_names": ["AVGO", "MRVL", "COHR"], "private_names": [], "catalysts": ["1.6T optics ramp"], "risks": ["Co-packaged optics displaces pluggables"], "sources": ["https://www.example.com/ai/mrvl-1.6t", "https://www.example.com/ai/cohr-vcsel"], "confidence": 0.78},
-        {"name": "Power, cooling, electrical", "layer": "enabling", "description": "Vertiv, Eaton, Schneider — picks-and-shovels for 1-GW data center campuses.", "public_names": ["VRT", "ETN"], "private_names": ["Schneider Electric"], "catalysts": ["Record backlogs on liquid cooling"], "risks": ["Cooling tech standardizing reduces margin"], "sources": ["https://www.example.com/ai/vertiv-q3", "https://www.example.com/ai/eaton-grid"], "confidence": 0.83},
+        {"name": "Power, cooling, electrical", "layer": "enabling", "description": "Vertiv, Eaton, Schneider, picks-and-shovels for 1-GW data center campuses.", "public_names": ["VRT", "ETN"], "private_names": ["Schneider Electric"], "catalysts": ["Record backlogs on liquid cooling"], "risks": ["Cooling tech standardizing reduces margin"], "sources": ["https://www.example.com/ai/vertiv-q3", "https://www.example.com/ai/eaton-grid"], "confidence": 0.83},
         {"name": "Accelerator design", "layer": "integrators", "description": "Nvidia dominates training; AMD gaining inference; Broadcom owns the hyperscaler ASIC slot.", "public_names": ["NVDA", "AMD", "AVGO"], "private_names": [], "catalysts": ["MI325X design wins", "Blackwell ramp"], "risks": ["ASIC TCO undercuts merchant GPU at scale"], "sources": ["https://www.example.com/ai/nvda-blackwell", "https://www.example.com/ai/amd-mi325", "https://www.example.com/ai/avgo-tpu"], "confidence": 0.85},
         {"name": "Servers & systems integration", "layer": "integrators", "description": "Supermicro and Dell ship AI racks; CoreWeave / neo-clouds buy them.", "public_names": ["SMCI", "DELL", "CRWV"], "private_names": ["Lambda"], "catalysts": ["Liquid-cooled rack ramp"], "risks": ["Margin compression as ODMs commoditize"], "sources": ["https://www.example.com/ai/smci-lambda", "https://www.example.com/ai/crwv"], "confidence": 0.68},
         {"name": "Data center real estate", "layer": "enabling", "description": "Equinix and Digital Realty hold the prime metros; xScale capacity is pre-leased.", "public_names": ["EQIX", "DLR"], "private_names": [], "catalysts": ["Record leasing volumes"], "risks": ["Power-constrained markets cap growth"], "sources": ["https://www.example.com/ai/eqix-xscale", "https://www.example.com/ai/dlr"], "confidence": 0.72},
@@ -125,16 +125,16 @@ def _ai_infra_pack() -> _ThemePack:
         {"name": "Inference at the edge", "layer": "applications", "description": "Apple Silicon and Qualcomm AI100 push inference onto devices and private clouds.", "public_names": ["AAPL", "QCOM"], "private_names": [], "catalysts": ["Apple Private Cloud Compute"], "risks": ["Cloud inference TCO falls faster than expected"], "sources": ["https://www.example.com/ai/aapl-pcc", "https://www.example.com/ai/qcom-ai100"], "confidence": 0.6},
     ]
     picks = [
-        "ASML — EUV monopoly is the deepest chokepoint; High-NA cycle extends moat into the next decade.",
-        "TSM — CoWoS capacity is the binding constraint on AI accelerator supply; lock-in across NVDA, AMD, AVGO.",
-        "MU — marginal HBM supplier with the largest unit-economic delta as supply tightens through 2026.",
-        "VRT — liquid cooling and busway capture every 1-GW campus build, with record backlog visibility.",
-        "AVGO — owns the hyperscaler custom-silicon slot (TPU + MTIA) plus the switch-ASIC franchise.",
+        "ASML: EUV monopoly is the deepest chokepoint; High-NA cycle extends moat into the next decade.",
+        "TSM: CoWoS capacity is the binding constraint on AI accelerator supply; lock-in across NVDA, AMD, AVGO.",
+        "MU: marginal HBM supplier with the largest unit-economic delta as supply tightens through 2026.",
+        "VRT: liquid cooling and busway capture every 1-GW campus build, with record backlog visibility.",
+        "AVGO: owns the hyperscaler custom-silicon slot (TPU + MTIA) plus the switch-ASIC franchise.",
     ]
     headlines = [
         "Accelerator economics: merchant GPU margins compress as ASIC TCO improves at scale.",
         "Power, not silicon, is the binding constraint for the next leg of AI capex.",
-        "HBM is a 2-supplier oligopoly today, a 3-supplier market by late 2025 — pricing fades.",
+        "HBM is a 2-supplier oligopoly today, a 3-supplier market by late 2025, so pricing fades.",
         "Hyperscaler ROI on AI capex is still unproven; a single quarter of pullback re-rates the chain.",
         "Geopolitical export controls on EUV, HBM, and rare earths could fork the global supply chain.",
         "Edge inference (Apple, Qualcomm) cannibalizes a slice of cloud demand if device-side models hit quality.",
@@ -144,8 +144,8 @@ def _ai_infra_pack() -> _ThemePack:
         "CoWoS packaging capacity, and the HBM oligopoly anchored by SK Hynix and Micron. Power and "
         "cooling (Vertiv, Eaton) are catching up in importance as 1-GW campuses become the unit of "
         "scale. The durable owners are the picks-and-shovels; accelerator margins (NVDA, AMD) face "
-        "real ASIC competition from Broadcom's hyperscaler franchise. The bear case is straightforward "
-        "— hyperscaler capex is running ahead of any clear AI revenue, and the chain is one capex "
+        "real ASIC competition from Broadcom's hyperscaler franchise. The bear case is straightforward: "
+        "hyperscaler capex is running ahead of any clear AI revenue, and the chain is one capex "
         "guide-down away from a sharp re-rating. We hedge by skewing picks toward bottlenecks that "
         "would still bind if growth merely persists rather than accelerates."
     )
@@ -232,25 +232,25 @@ def _robotics_pack() -> _ThemePack:
         {"name": "Motors & actuators", "layer": "enabling", "description": "Nidec and Maxon supply high-density motors for industrial and humanoid platforms.", "public_names": [], "private_names": ["Nidec", "Maxon", "Moog"], "catalysts": ["Humanoid build ramp"], "risks": ["Vertical integration by TSLA/Figure"], "sources": ["https://www.example.com/r/nidec"], "confidence": 0.7},
         {"name": "Vision & sensing", "layer": "enabling", "description": "Cognex (industrial), Keyence (factory), Sony (CIS), Hesai/Luminar (lidar).", "public_names": ["CGNX", "HSAI", "LAZR"], "private_names": ["Keyence", "Sony"], "catalysts": ["AI-first vision systems"], "risks": ["Commoditization of lidar"], "sources": ["https://www.example.com/r/cgnx", "https://www.example.com/r/keyence", "https://www.example.com/r/hsai"], "confidence": 0.74},
         {"name": "Compute & foundation models", "layer": "enabling", "description": "Nvidia Isaac/GR00T as the platform layer for humanoid policy pretraining.", "public_names": ["NVDA"], "private_names": [], "catalysts": ["GR00T model releases"], "risks": ["Open-source alternatives"], "sources": ["https://www.example.com/r/isaac"], "confidence": 0.66},
-        {"name": "Industrial robot OEMs", "layer": "integrators", "description": "Fanuc, ABB, Yaskawa, KUKA — incumbent franchise with cycle leverage.", "public_names": [], "private_names": ["Fanuc", "ABB", "Yaskawa", "KUKA"], "catalysts": ["Cycle inflection"], "risks": ["China onshoring share gains"], "sources": ["https://www.example.com/r/fanuc", "https://www.example.com/r/abb-amr", "https://www.example.com/r/yaskawa"], "confidence": 0.7},
+        {"name": "Industrial robot OEMs", "layer": "integrators", "description": "Fanuc, ABB, Yaskawa, KUKA, incumbent franchise with cycle leverage.", "public_names": [], "private_names": ["Fanuc", "ABB", "Yaskawa", "KUKA"], "catalysts": ["Cycle inflection"], "risks": ["China onshoring share gains"], "sources": ["https://www.example.com/r/fanuc", "https://www.example.com/r/abb-amr", "https://www.example.com/r/yaskawa"], "confidence": 0.7},
         {"name": "Humanoids", "layer": "integrators", "description": "Tesla Optimus, Figure, Boston Dynamics, Unitree; capability-cost frontier is moving fast.", "public_names": ["TSLA"], "private_names": ["Figure", "Boston Dynamics", "Unitree"], "catalysts": ["BMW Figure deployment", "Optimus 2025 build"], "risks": ["Demonstrations vs. revenue gap"], "sources": ["https://www.example.com/r/figure-bmw", "https://www.example.com/r/optimus-target", "https://www.example.com/r/unitree"], "confidence": 0.55},
         {"name": "Warehouse automation", "layer": "applications", "description": "Symbotic (Walmart), Amazon robotics, Boston Dynamics Stretch at GXO.", "public_names": ["SYM", "AMZN"], "private_names": ["Boston Dynamics"], "catalysts": ["Symbotic $23B backlog"], "risks": ["Customer concentration (Walmart)"], "sources": ["https://www.example.com/r/sym", "https://www.example.com/r/amzn-robots", "https://www.example.com/r/bdyn-gxo"], "confidence": 0.7},
         {"name": "Surgical robotics", "layer": "applications", "description": "Intuitive Surgical's da Vinci 5 cycle plus razor/blade instrument economics.", "public_names": ["ISRG"], "private_names": [], "catalysts": ["da Vinci 5 ramp"], "risks": ["Competition from Medtronic Hugo"], "sources": ["https://www.example.com/r/isrg"], "confidence": 0.78},
         {"name": "Mobility / robotaxi", "layer": "applications", "description": "Autonomous-vehicle programs depend on sensor + compute pipelines from same supply chain.", "public_names": ["TSLA"], "private_names": ["Waymo", "Cruise"], "catalysts": ["Lidar BOM cost decline"], "risks": ["Regulation in US/EU"], "sources": ["https://www.example.com/r/hsai", "https://www.example.com/r/lazr"], "confidence": 0.5},
     ]
     picks = [
-        "ISRG — best risk-adjusted exposure to robotics today: monopoly razor/blade economics in surgical automation.",
-        "SYM — concentrated Walmart bet, but the backlog is real and the tech is in production.",
-        "CGNX — picks-and-shovels for any robotics build-out; cycle inflection ahead.",
-        "NVDA — Isaac/GR00T compounds the AI-infra bet into the robotics stack.",
-        "HSAI — lidar BOM owner with diversified Chinese OEM wins; cheap on volume scaling.",
+        "ISRG: best risk-adjusted exposure to robotics today: monopoly razor/blade economics in surgical automation.",
+        "SYM: concentrated Walmart bet, but the backlog is real and the tech is in production.",
+        "CGNX: picks-and-shovels for any robotics build-out; cycle inflection ahead.",
+        "NVDA: Isaac/GR00T compounds the AI-infra bet into the robotics stack.",
+        "HSAI: lidar BOM owner with diversified Chinese OEM wins; cheap on volume scaling.",
     ]
     headlines = [
         "Humanoid demos remain demos; revenue inflection is still 2027+ on any honest analysis.",
-        "Industrial robotics is cyclical first, secular second — don't pay for secular at cycle highs.",
+        "Industrial robotics is cyclical first, secular second; don't pay for secular at cycle highs.",
         "Vertical integration risk: TSLA and Figure could absorb most actuator value internally.",
         "China supplies the magnets, the motors, and increasingly the humanoid platforms themselves.",
-        "Lidar is commoditizing — diversification across programs matters more than tech leadership.",
+        "Lidar is commoditizing; diversification across programs matters more than tech leadership.",
     ]
     summary = (
         "Robotics is a barbell: surgical and warehouse automation are real businesses today (ISRG, "
@@ -344,25 +344,25 @@ def _energy_pack() -> _ThemePack:
         {"name": "Solid-state batteries", "layer": "enabling", "description": "QuantumScape and Sila are the public-equity proxies; commercialization risk remains high.", "public_names": ["QS"], "private_names": ["Sila"], "catalysts": ["Pilot line cell shipments"], "risks": ["Timeline slippage"], "sources": ["https://www.example.com/e/qs"], "confidence": 0.4},
         {"name": "Solar PV", "layer": "enabling", "description": "First Solar sold out at fixed pricing; Enphase holds US residential.", "public_names": ["FSLR", "ENPH"], "private_names": [], "catalysts": ["Series 7 capacity ramp"], "risks": ["Tariff regime changes"], "sources": ["https://www.example.com/e/fslr", "https://www.example.com/e/enph"], "confidence": 0.74},
         {"name": "Wind", "layer": "integrators", "description": "Vestas pricing recovers; offshore segment still under stress.", "public_names": [], "private_names": ["Vestas"], "catalysts": ["Onshore pricing inflection"], "risks": ["Permitting delays"], "sources": ["https://www.example.com/e/vws"], "confidence": 0.6},
-        {"name": "Grid build-out", "layer": "enabling", "description": "Quanta, GE Vernova, Eaton, Hubbell, Siemens Energy — the deepest moat in energy transition today.", "public_names": ["PWR", "GEV", "ETN", "HUBB"], "private_names": ["Siemens Energy", "Schneider Electric"], "catalysts": ["Record HVDC and transformer orders"], "risks": ["Customer concentration in hyperscalers"], "sources": ["https://www.example.com/e/pwr", "https://www.example.com/e/gev", "https://www.example.com/e/etn", "https://www.example.com/e/hubb", "https://www.example.com/e/siemens"], "confidence": 0.88},
+        {"name": "Grid build-out", "layer": "enabling", "description": "Quanta, GE Vernova, Eaton, Hubbell, Siemens Energy, the deepest moat in energy transition today.", "public_names": ["PWR", "GEV", "ETN", "HUBB"], "private_names": ["Siemens Energy", "Schneider Electric"], "catalysts": ["Record HVDC and transformer orders"], "risks": ["Customer concentration in hyperscalers"], "sources": ["https://www.example.com/e/pwr", "https://www.example.com/e/gev", "https://www.example.com/e/etn", "https://www.example.com/e/hubb", "https://www.example.com/e/siemens"], "confidence": 0.88},
         {"name": "Power electronics & software", "layer": "enabling", "description": "Schneider EcoStruxure and grid-orchestration software is the highest-margin layer.", "public_names": [], "private_names": ["Schneider Electric"], "catalysts": ["Software ARR growth"], "risks": ["Hyperscaler in-house buildouts"], "sources": ["https://www.example.com/e/schneider"], "confidence": 0.66},
-        {"name": "Nuclear (SMRs, restarts)", "layer": "integrators", "description": "Holtec restarts, Oklo behind-the-meter SMRs for data centers — narrative-rich, lumpy execution.", "public_names": ["SMR", "OKLO"], "private_names": ["Holtec"], "catalysts": ["Data-center PPA signings"], "risks": ["Project delays (NuScale precedent)"], "sources": ["https://www.example.com/e/smr", "https://www.example.com/e/holtec", "https://www.example.com/e/oklo"], "confidence": 0.5},
+        {"name": "Nuclear (SMRs, restarts)", "layer": "integrators", "description": "Holtec restarts, Oklo behind-the-meter SMRs for data centers, narrative-rich, lumpy execution.", "public_names": ["SMR", "OKLO"], "private_names": ["Holtec"], "catalysts": ["Data-center PPA signings"], "risks": ["Project delays (NuScale precedent)"], "sources": ["https://www.example.com/e/smr", "https://www.example.com/e/holtec", "https://www.example.com/e/oklo"], "confidence": 0.5},
         {"name": "Hydrogen", "layer": "enabling", "description": "Plug Power and Bloom remain narrative plays; Bloom has near-term data-center pull.", "public_names": ["PLUG", "BE"], "private_names": [], "catalysts": ["Behind-the-meter data-center fuel cells"], "risks": ["Tax-credit dependency"], "sources": ["https://www.example.com/e/plug", "https://www.example.com/e/be"], "confidence": 0.42},
         {"name": "Electrification end-markets", "layer": "applications", "description": "Heat pumps (Carrier, Trane), EV charging (ChargePoint, EVgo).", "public_names": ["CARR", "TT", "CHPT", "EVGO"], "private_names": [], "catalysts": ["Trane data-center HVAC growth"], "risks": ["Residential heat-pump growth slowing"], "sources": ["https://www.example.com/e/carr", "https://www.example.com/e/tt", "https://www.example.com/e/chpt", "https://www.example.com/e/evgo"], "confidence": 0.55},
     ]
     picks = [
-        "ETN — best risk/reward in grid electrification: data-center + reshoring tailwinds, durable margins.",
-        "PWR — Quanta is the prime contractor for the grid build; backlog visibility through decade.",
-        "FSLR — sold-out Series 7 at fixed prices = pricing power that doesn't show up in spot data.",
-        "GEV — GE Vernova's HVDC franchise is uniquely positioned for inter-regional transmission.",
-        "FCX — leveraged exposure to structurally tight copper supply, with a buyback optionality.",
+        "ETN: best risk/reward in grid electrification: data-center + reshoring tailwinds, durable margins.",
+        "PWR: Quanta is the prime contractor for the grid build; backlog visibility through decade.",
+        "FSLR: sold-out Series 7 at fixed prices = pricing power that doesn't show up in spot data.",
+        "GEV: GE Vernova's HVDC franchise is uniquely positioned for inter-regional transmission.",
+        "FCX: leveraged exposure to structurally tight copper supply, with a buyback optionality.",
     ]
     headlines = [
         "Most 'energy transition' returns the next 3 years come from the grid, not the cells.",
-        "Solid-state batteries and green hydrogen remain prove-it stories — public equity is too early.",
+        "Solid-state batteries and green hydrogen remain prove-it stories, public equity is too early.",
         "Hyperscaler power demand is the dominant marginal buyer; data center is the new utility customer.",
         "Chinese cell overcapacity caps battery margins; the picks-and-shovels (grid, power electronics) escape.",
-        "Nuclear-SMR euphoria forgets the NuScale precedent — first-of-kind timelines slip.",
+        "Nuclear-SMR euphoria forgets the NuScale precedent, first-of-kind timelines slip.",
     ]
     summary = (
         "The most durable energy-transition exposure for the next three years is the grid build, not the "
@@ -425,17 +425,17 @@ def _generic_pack(theme: str) -> _ThemePack:
         for i in range(1, 21)
     ]
     nodes = [
-        {"name": f"Raw inputs for {theme}", "layer": "raw_inputs", "description": "Demo layer — replace with real data by setting API keys.", "public_names": ["DEMO"], "private_names": [], "catalysts": ["Demo catalyst"], "risks": ["Demo risk"], "sources": ["https://www.example.com/g/1"], "confidence": 0.5},
+        {"name": f"Raw inputs for {theme}", "layer": "raw_inputs", "description": "Demo layer, replace with real data by setting API keys.", "public_names": ["DEMO"], "private_names": [], "catalysts": ["Demo catalyst"], "risks": ["Demo risk"], "sources": ["https://www.example.com/g/1"], "confidence": 0.5},
         {"name": f"Enabling technology in {theme}", "layer": "enabling", "description": "Demo layer.", "public_names": ["DEMO"], "private_names": ["DemoCo"], "catalysts": ["Demo catalyst"], "risks": ["Demo risk"], "sources": ["https://www.example.com/g/5"], "confidence": 0.5},
         {"name": f"{theme} integrators", "layer": "integrators", "description": "Demo layer.", "public_names": ["DEMO"], "private_names": [], "catalysts": ["Demo catalyst"], "risks": ["Demo risk"], "sources": ["https://www.example.com/g/10"], "confidence": 0.5},
         {"name": f"{theme} end-market applications", "layer": "applications", "description": "Demo layer.", "public_names": ["DEMO"], "private_names": [], "catalysts": ["Demo catalyst"], "risks": ["Demo risk"], "sources": ["https://www.example.com/g/15"], "confidence": 0.5},
     ]
     picks = [
-        f"DEMO — demo pick for {theme}; configure API keys for real output.",
-        "DEMO — second demo pick.",
-        "DEMO — third demo pick.",
-        "DEMO — fourth demo pick.",
-        "DEMO — fifth demo pick.",
+        f"DEMO: demo pick for {theme}; configure API keys for real output.",
+        "DEMO: second demo pick.",
+        "DEMO: third demo pick.",
+        "DEMO: fourth demo pick.",
+        "DEMO: fifth demo pick.",
     ]
     headlines = [
         f"Demo mode does not produce real analysis for {theme}.",
@@ -444,7 +444,7 @@ def _generic_pack(theme: str) -> _ThemePack:
     ]
     summary = (
         f"This is demo output for the theme '{theme}'. The full graph exercised the real researcher, "
-        "skeptic, and synthesizer agents — only the LLM calls and search results were stubbed. "
+        "skeptic, and synthesizer agents, only the LLM calls and search results were stubbed. "
         "To produce a real thesis, set API keys and run without the --demo flag."
     )
     diagram = """graph LR
@@ -560,7 +560,7 @@ class DemoLLM(LLMClient):
         trace: TraceWriter | None = None,
         max_cost_usd: float | None = None,
     ) -> None:
-        # Skip super().__init__ — we don't need the real config or LiteLLM.
+        # Skip super().__init__, we don't need the real config or LiteLLM.
         self.trace = trace or TraceWriter()
         self.max_cost_usd = max_cost_usd
         self._theme = theme
@@ -649,7 +649,7 @@ class DemoLLM(LLMClient):
                 novelty=DimensionScore(score=3, justification="demo"),
                 actionability=DimensionScore(score=4, justification="demo"),
             )
-        # Unknown structured request — let Instructor's validator handle it
+        # Unknown structured request, let Instructor's validator handle it
         # the same way the real client would (raise).
         raise NotImplementedError(f"DemoLLM has no canned response for {name}")
 
@@ -728,7 +728,7 @@ class DemoLLM(LLMClient):
         verdict = random.choices(["weak", "mixed", "strong"], weights=[1, 2, 3])[0]
         argument = {
             "bottleneck_vs_commodity": f"{node_name} screens as a chokepoint today, but the relevant question is whether pricing power persists once a second supplier qualifies.",
-            "substitution_risk": f"{node_name}'s substitution path is real but underwritten — three years out is the right horizon, not one.",
+            "substitution_risk": f"{node_name}'s substitution path is real but underwritten, three years out is the right horizon, not one.",
             "priced_in": f"Consensus on {node_name} is constructive; the variant view is on duration, not direction.",
         }.get(angle, "Demo critique.")
         self._counters.critiques_emitted += 1
@@ -766,7 +766,7 @@ def _extract(text: str, pattern: str) -> str | None:
 
 def _build_memo(pack: _ThemePack, nodes: list[Node]) -> str:
     sections: list[str] = [
-        f"# {pack.theme} — Value Chain Thesis",
+        f"# {pack.theme}: Value Chain Thesis",
         "",
         "## Summary",
         "",
@@ -787,8 +787,8 @@ def _build_memo(pack: _ThemePack, nodes: list[Node]) -> str:
         sections.append(f"### {label}")
         sections.append("")
         for n in layer_nodes:
-            tickers = ", ".join(n.public_names) or "—"
-            sections.append(f"- **{n.name}** ({tickers}) — {n.description}")
+            tickers = ", ".join(n.public_names) or "n/a"
+            sections.append(f"- **{n.name}** ({tickers}): {n.description}")
         sections.append("")
     sections.append("## Investable picks")
     sections.append("")

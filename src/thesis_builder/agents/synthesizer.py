@@ -1,7 +1,7 @@
 """Synthesizer agent.
 
 Merges the research bundle and skeptic report into a final ``FinalOutput``
-(thesis JSON + memo markdown + Mermaid diagram). Uses tier-quality only —
+(thesis JSON + memo markdown + Mermaid diagram). Uses tier-quality only;
 the brief reserves the expensive tier for this single pass.
 
 The system prompt is stable across runs, so Anthropic prompt caching
@@ -72,8 +72,8 @@ def _draft_tree_block(bundle: ResearchBundle) -> str:
         return "(researcher returned no draft nodes; build the tree from summaries alone)"
     lines = []
     for n in bundle.draft_nodes:
-        tickers = ", ".join(n.public_names) or "—"
-        priv = ", ".join(n.private_names) or "—"
+        tickers = ", ".join(n.public_names) or "n/a"
+        priv = ", ".join(n.private_names) or "n/a"
         lines.append(
             f"- [{n.layer}] {n.name} (conf={n.confidence:.2f})\n"
             f"  tickers: {tickers}; private: {priv}\n"

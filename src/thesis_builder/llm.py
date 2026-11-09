@@ -80,7 +80,7 @@ def _load_config(path: str | Path) -> dict[str, Any]:
 class TraceWriter:
     """Thread-safe JSONL writer for trace events.
 
-    Trace path is mutable — the CLI rebinds it to outputs/<theme>/trace.jsonl
+    Trace path is mutable, the CLI rebinds it to outputs/<theme>/trace.jsonl
     once the theme is known. The optional ``on_event`` callback receives every
     event after it's written; the server uses it to push SSE updates.
     """
@@ -218,7 +218,7 @@ class LLMClient:
                 )
                 return result
             except AuthenticationError as e:
-                # Missing/invalid key for this provider — silently fall through.
+                # Missing/invalid key for this provider, silently fall through.
                 last_err = e
                 continue
             except _RETRYABLE as e:
@@ -233,7 +233,7 @@ class LLMClient:
                     }
                 )
                 continue
-            except Exception as e:  # noqa: BLE001 — bubble after exhausting fallbacks
+            except Exception as e:  # noqa: BLE001, bubble after exhausting fallbacks
                 last_err = e
                 self.trace.write(
                     {

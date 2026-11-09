@@ -21,7 +21,7 @@ __all__ = ["DimensionScore", "JudgeScores", "JUDGE_SYSTEM", "JUDGE_USER", "judge
 
 JUDGE_SYSTEM = """You are an experienced equity-research editor scoring a value-chain investment thesis.
 
-Score each of four dimensions on a 0–5 integer scale and justify in one sentence.
+Score each of four dimensions on a 0 to 5 integer scale and justify in one sentence.
 
   - coverage:      0 = missing layers or entities; 5 = all 4 layers, ≥2 named companies/layer.
   - specificity:   0 = vague marketing prose; 5 = consistently names companies, numbers, catalysts.

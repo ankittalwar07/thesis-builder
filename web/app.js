@@ -46,7 +46,7 @@
       if (cfg.has_tavily) keys.push("tavily");
       $("config-hint").textContent = keys.length
         ? "keys present: " + keys.join(", ")
-        : "no API keys — demo only";
+        : "no API keys, demo only";
     });
 
   // ---- run ----
@@ -96,7 +96,7 @@
     setMetric("small", "0");
     setMetric("reasoning", "0");
     setMetric("quality", "0");
-    setMetric("cheap", "—");
+    setMetric("cheap", "n/a");
     setMetric("searches", "0");
     setMetric("summaries", "0");
     setMetric("critiques", "0");
@@ -274,10 +274,10 @@
     const el = $("tab-picks");
     el.innerHTML = picks
       .map((p, i) => {
-        const m = p.match(/^([^—-]+?)\s*[—-]\s*(.*)$/);
+        const m = p.match(/^([^:\u2014-]+?)\s*[:\u2014-]\s*(.*)$/);
         const ticker = m ? m[1].trim() : "PICK";
         const rationale = m ? m[2].trim() : p;
-        return `<div class="pick"><span class="rank">#${i + 1}</span><span class="ticker">${escapeHtml(ticker)}</span> — ${escapeHtml(rationale)}</div>`;
+        return `<div class="pick"><span class="rank">#${i + 1}</span><span class="ticker">${escapeHtml(ticker)}</span>: ${escapeHtml(rationale)}</div>`;
       })
       .join("");
   }
@@ -304,7 +304,7 @@
     const r = Number($("m-reasoning").textContent) || 0;
     const q = Number($("m-quality").textContent) || 0;
     const total = s + r + q;
-    setMetric("cheap", total ? Math.round((100 * (s + r)) / total) + "%" : "—");
+    setMetric("cheap", total ? Math.round((100 * (s + r)) / total) + "%" : "n/a");
   }
 
   function escapeHtml(s) {

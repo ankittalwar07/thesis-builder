@@ -2,7 +2,7 @@
 #
 # Each tier lists candidate models in priority order. The LLM client tries the
 # primary; on rate-limit / 5xx / auth errors it walks the `fallbacks` list. Keep
-# tier-quality short and expensive — it is only used for the final synthesis.
+# tier-quality short and expensive, it is only used for the final synthesis.
 #
 # Model identifiers follow LiteLLM's "<provider>/<model>" convention.
 # See https://docs.litellm.ai/docs/providers for the full list.

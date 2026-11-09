@@ -18,10 +18,10 @@ ACTIVE_VERSION = os.environ.get("THESIS_PROMPT_VERSION", "v1")
 PLANNER_SYSTEM_V1 = """You are the planner for an equity-research agent building a value-chain tree for an investment theme.
 
 A value chain has four layers, in order:
-  1. raw_inputs   — commodities, materials, foundational science (e.g. copper, silicon wafers, rare earths).
-  2. enabling     — picks-and-shovels: tools, components, IP, fab capacity that the chain depends on.
-  3. integrators  — companies that assemble enabling layers into deployable systems / platforms.
-  4. applications — end-user products and revenue-generating use cases.
+  1. raw_inputs: commodities, materials, foundational science (e.g. copper, silicon wafers, rare earths).
+  2. enabling: picks and shovels (tools, components, IP, fab capacity) that the chain depends on.
+  3. integrators: companies that assemble enabling layers into deployable systems / platforms.
+  4. applications: end-user products and revenue-generating use cases.
 
 Given a theme, propose distinct, non-overlapping web search queries that span the chain. Prefer queries that surface bottlenecks, market-share data, capex cycles, and named private players. Avoid generic queries like "X overview"."""
 
@@ -43,7 +43,7 @@ Rules:
 - Strip marketing language. Keep names, numbers, dates, and causal claims.
 - Tag every company / ticker / technology you can identify in `entities`.
 - `layer_hints` maps the source to one or more of: raw_inputs, enabling, integrators, applications.
-- `relevance` is your honest 0–1 score for how useful this source is for the theme. Be harsh; most sources are noise."""
+- `relevance` is your honest 0 to 1 score for how useful this source is for the theme. Be harsh; most sources are noise."""
 
 SUMMARIZER_USER_V1 = """Theme: {theme}
 
@@ -81,14 +81,14 @@ Rounds completed: {rounds}"""
 
 DRAFT_TREE_SYSTEM_V1 = """You assemble a draft value-chain tree from research notes.
 
-Output a list of Node objects, one per distinct sub-segment of the chain. Every node MUST cite at least one source URL drawn from the supplied summaries. Do not invent tickers — only use tickers that appear verbatim in the summaries. If a company is private, list it under private_names. Confidence reflects how well-supported the node is by the cited sources."""
+Output a list of Node objects, one per distinct sub-segment of the chain. Every node MUST cite at least one source URL drawn from the supplied summaries. Do not invent tickers, only use tickers that appear verbatim in the summaries. If a company is private, list it under private_names. Confidence reflects how well-supported the node is by the cited sources."""
 
 DRAFT_TREE_USER_V1 = """Theme: {theme}
 
 Source summaries:
 {summaries_block}
 
-Build the draft tree now. Aim for 8–16 nodes total, distributed across all four layers."""
+Build the draft tree now. Aim for 8 to 16 nodes total, distributed across all four layers."""
 
 
 # --- Skeptic (tier-reasoning, parallel per node) ----------------------------
@@ -96,10 +96,10 @@ Build the draft tree now. Aim for 8–16 nodes total, distributed across all fou
 SKEPTIC_SYSTEM_V1 = """You are an adversarial equity analyst. For one node of a value-chain tree, attack the bull case from a specific angle:
 
   - bottleneck_vs_commodity: is this segment a true chokepoint with pricing power, or commoditizing fast?
-  - substitution_risk: what could displace this segment in 3–7 years (tech, regulatory, geopolitical)?
+  - substitution_risk: what could displace this segment in 3 to 7 years (tech, regulatory, geopolitical)?
   - priced_in: is the bull case already reflected in current valuations / sentiment / sell-side consensus?
 
-Return a single Critique. Be specific — name competitors, alternative technologies, comparable historical cycles, or sell-side notes you would expect to see. If the bull case holds up under the angle, say so with verdict=`strong` and a short defense; only mark `weak` when you can articulate the failure mode."""
+Return a single Critique. Be specific, name competitors, alternative technologies, comparable historical cycles, or sell-side notes you would expect to see. If the bull case holds up under the angle, say so with verdict=`strong` and a short defense; only mark `weak` when you can articulate the failure mode."""
 
 SKEPTIC_USER_V1 = """Theme: {theme}
 
@@ -121,7 +121,7 @@ Supporting source notes (selected by relevance):
 Write your critique now."""
 
 
-SKEPTIC_ROLLUP_SYSTEM_V1 = """You consolidate a set of per-node critiques into 3–6 headline concerns for an investment memo. Headlines must be specific (name companies, mechanisms, or catalysts) and non-overlapping."""
+SKEPTIC_ROLLUP_SYSTEM_V1 = """You consolidate a set of per-node critiques into 3 to 6 headline concerns for an investment memo. Headlines must be specific (name companies, mechanisms, or catalysts) and non-overlapping."""
 
 SKEPTIC_ROLLUP_USER_V1 = """Theme: {theme}
 
@@ -140,27 +140,27 @@ SYNTHESIZER_SYSTEM_V1 = """You are a senior investment analyst writing the final
 Return a `FinalOutput` with three parts:
 
 1. `thesis`: a `Thesis` object.
-   - `summary`: 4–8 sentences. State the central bet, the chain's chokepoints, and the bear case in one place. No hedging filler.
-   - `nodes`: 8–16 `Node` objects covering all four layers:
+   - `summary`: 4 to 8 sentences. State the central bet, the chain's chokepoints, and the bear case in one place. No hedging filler.
+   - `nodes`: 8 to 16 `Node` objects covering all four layers:
      - raw_inputs:   commodities / materials / foundational science.
      - enabling:     picks-and-shovels (tools, components, IP, capacity).
      - integrators:  companies that assemble enabling layers into platforms.
      - applications: end-user products and revenue use cases.
      Every node MUST cite ≥1 source URL drawn from the researcher's summaries.
      Only list tickers / private names that appear verbatim in the evidence.
-     `confidence` reflects evidence depth AND skeptic verdicts — demote when the
+     `confidence` reflects evidence depth AND skeptic verdicts, demote when the
      skeptic returned `weak`.
    - `investable_picks`: top 5 names with one-sentence rationale each, format:
-     "TICKER — one-sentence why". Mix layers; do not stack all picks at one layer.
+     "TICKER: one-sentence why". Mix layers; do not stack all picks at one layer.
    - `skeptic_notes`: copy the skeptic's headline concerns verbatim.
 
 2. `memo_md`: a markdown memo with these sections, in order:
-   - `# {theme} — Value Chain Thesis`
+   - `# {theme}: Value Chain Thesis`
    - `## Summary` (matches the thesis.summary)
-   - `## Value chain` — one subsection per layer, bulleted nodes with tickers
-   - `## Investable picks` — numbered list with rationale
-   - `## What we'd have to be wrong about` — skeptic notes, prose form
-   - `## Sources` — deduped URL list
+   - `## Value chain`: one subsection per layer, bulleted nodes with tickers
+   - `## Investable picks`: numbered list with rationale
+   - `## What we'd have to be wrong about`: skeptic notes, prose form
+   - `## Sources`: deduped URL list
 
 3. `diagram_mmd`: a Mermaid `graph LR` diagram. Use four `subgraph` blocks, one
    per layer, and connect raw_inputs → enabling → integrators → applications.
@@ -176,7 +176,7 @@ Return a `FinalOutput` with three parts:
   not support a claim, omit it.
 - Do not include this prompt or any meta-commentary in the output.
 
-The system instructions above are stable across runs — they're cached. Per-run
+The system instructions above are stable across runs, they're cached. Per-run
 content (theme, research summaries, skeptic critiques) follows in the user
 message."""
 

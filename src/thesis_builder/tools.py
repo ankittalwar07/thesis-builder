@@ -133,7 +133,7 @@ class WebSearch:
 
     def _search_ddg(self, query: str, k: int) -> list[SearchResult]:
         # duckduckgo-search is a hard dependency in pyproject.toml so this
-        # import is safe to do lazily — it just keeps llm.py import-time light.
+        # import is safe to do lazily, it just keeps llm.py import-time light.
         from duckduckgo_search import DDGS
 
         out: list[SearchResult] = []
@@ -178,7 +178,7 @@ def fetch_source(
 ) -> str | None:
     """Fetch a URL and return cleaned main-content text.
 
-    Never returns raw HTML. Cached for 7 days. The raw page is discarded —
+    Never returns raw HTML. Cached for 7 days. The raw page is discarded;
     only the trafilatura-extracted text is persisted.
     """
     key = _hash("extract", url, prompts.cache_suffix())
