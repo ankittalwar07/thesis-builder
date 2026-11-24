@@ -233,6 +233,23 @@ it (`git restore --staged <path>`) before committing. If the push fails on a
 network error, retry up to 4 times, waiting 2, 4, 8 and 16 seconds. Do not force
 push.
 
+If the push to `main` is refused for permission (not a network error, and not
+because main moved), this session may only push `claude/` branches. Publish
+through a pull request instead, using the GitHub REST API (`gh pr` needs
+GraphQL, which may be blocked here):
+
+```bash
+BR="claude/data-$(date -u +%F)"
+git push origin HEAD:"$BR"
+PR=$(gh api repos/ankittalwar07/thesis-builder/pulls \
+  -f title="data: weekly theses $(date -u +%F)" -f head="$BR" -f base=main \
+  -f body="Automated data refresh from the scheduled routine. Only data files changed." -q .number)
+gh api -X PUT repos/ankittalwar07/thesis-builder/pulls/$PR/merge -f merge_method=squash
+```
+
+If the merge call fails, leave the pull request open and say so in your report,
+with its number. Never change branch protection or repo settings.
+
 ## 8. Final summary
 
 End the session with a short summary: per theme, the node count, unique URLs,
