@@ -154,7 +154,7 @@ thesis-builder/
 
 ## Author
 
-Built by Ankit Talwar. [LINKEDIN LINK NEEDED]
+Built by Ankit Talwar. [LinkedIn](https://www.linkedin.com/in/ankittalwar/)
 
 ## Disclaimer
 
