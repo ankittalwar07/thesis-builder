@@ -27,7 +27,7 @@ except Exception:
     pass
 
 from .graph import build_graph
-from .llm import BudgetExceeded, LLMClient, TraceWriter
+from .llm import BudgetExceeded, LLMClient, TraceWriter, default_config_path
 from .schemas import FinalOutput
 from .tools import CacheBundle, WebSearch
 
@@ -50,8 +50,9 @@ def main(argv: list[str] | None = None) -> int:
     )
     parser.add_argument(
         "--config",
-        default="config/models.yaml",
-        help="Model tier config (default: config/models.yaml)",
+        default=default_config_path(),
+        help="Model tier config (default: THESIS_MODELS_CONFIG or config/models.yaml; "
+        "config/models.local.yaml runs on a local model server)",
     )
     parser.add_argument(
         "--cache-dir",
@@ -75,10 +76,25 @@ def main(argv: list[str] | None = None) -> int:
         help="Also write the GitHub Pages JSON (themes/<slug>.json + index.json) here, "
         "e.g. docs/data",
     )
+    parser.add_argument(
+        "--no-skeptic",
+        action="store_true",
+        help="Ablation: skip the Skeptic (writes to <slug>__no_skeptic, cannot be published). "
+        "scripts/ablation.py is the controlled version that reuses one research run.",
+    )
+    parser.add_argument(
+        "--demo-fault",
+        action="store_true",
+        help="Demo only: the first Synthesizer attempt claims a concession it did not make, "
+        "to show the rebuttal check refusing it and the retry.",
+    )
     args = parser.parse_args(argv)
 
     console = Console()
-    slug = _slug(args.theme)
+    if args.no_skeptic and args.publish_dir:
+        console.print("[red]--no-skeptic runs are for comparison only and cannot be published[/red]")
+        return 2
+    slug = _slug(args.theme) + ("__no_skeptic" if args.no_skeptic else "")
     out_dir = Path(args.output_dir) / slug
     out_dir.mkdir(parents=True, exist_ok=True)
     trace_path = out_dir / "trace.jsonl"
@@ -90,7 +106,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.demo:
         from .demo import DemoLLM, DemoSearch, offline_fetch
 
-        llm: LLMClient = DemoLLM(theme=args.theme, trace=trace)
+        llm: LLMClient = DemoLLM(theme=args.theme, trace=trace, fault_once=args.demo_fault)
         search = DemoSearch(theme=args.theme, trace=trace)
         cache_dir = ".diskcache_demo"
         cache = CacheBundle(cache_dir)
@@ -124,7 +140,15 @@ def main(argv: list[str] | None = None) -> int:
     t0 = time.perf_counter()
     try:
         with fetch_ctx:
-            graph = build_graph(llm=llm, search=search, cache=cache, console=console)
+            graph = build_graph(
+                llm=llm, search=search, cache=cache, console=console,
+                skip_skeptic=args.no_skeptic,
+                on_protocol=lambda attempt, res: console.print(
+                    f"[{'green' if res.passed else 'red'}]rebuttal check, attempt {attempt}: "
+                    + ("passed" if res.passed else "refused") + "[/]"
+                    + "".join(f"\n  - {e}" for e in res.errors)
+                ),
+            )
             result = graph.invoke({"theme": args.theme})
     except BudgetExceeded as e:
         console.print(f"[red]cost cap hit before completion: {e}[/red]")
@@ -139,6 +163,38 @@ def main(argv: list[str] | None = None) -> int:
         console.print("[red]no final output produced[/red]")
         return 1
 
+    # --- obligated rebuttal ------------------------------------------------
+
+    import json
+
+    check = result.get("protocol")
+    bundle = result.get("research")
+    skeptic = result.get("skeptic")
+    answers = {a.critique_id: a for a in final.answers}
+    audit = {
+        "protocol": {
+            "passed": bool(check is None or check.passed),
+            "attempts": getattr(check, "attempts", 1),
+            "errors": list(getattr(check, "errors", [])),
+            "warnings": list(getattr(check, "warnings", [])),
+            "refused": list(result.get("protocol_refused", [])),
+        },
+        "draft_nodes": [json.loads(n.model_dump_json()) for n in (bundle.draft_nodes if bundle else [])],
+        "critiques": [
+            {**json.loads(c.model_dump_json()),
+             "answer": json.loads(answers[c.id].model_dump_json()) if c.id in answers else None}
+            for c in (skeptic.critiques if skeptic else [])
+        ],
+    }
+    audit_path = out_dir / "rebuttals.json"
+    audit_path.write_text(json.dumps(audit, indent=2) + "\n")
+    if check is not None and not check.passed:
+        console.print(
+            "[red]rebuttal check refused the Synthesizer's answers; nothing published.[/red]\n"
+            f"  details: {audit_path}"
+        )
+        return 4
+
     # --- write artifacts ----------------------------------------------------
 
     thesis_path = out_dir / "thesis.json"
@@ -152,8 +208,6 @@ def main(argv: list[str] | None = None) -> int:
 
     # --- summary ------------------------------------------------------------
 
-    bundle = result.get("research")
-    skeptic = result.get("skeptic")
     table = Table(title="Run summary", show_lines=False)
     table.add_column("metric")
     table.add_column("value", justify="right")
@@ -167,6 +221,10 @@ def main(argv: list[str] | None = None) -> int:
         )
     if skeptic is not None:
         table.add_row("skeptic critiques", str(len(skeptic.critiques)))
+        table.add_row(
+            "rebuttal check",
+            f"passed on attempt {getattr(check, 'attempts', 1)}" if check is not None else "n/a",
+        )
     table.add_row("cache hit rate", f"{cache.hit_rate():.0%}")
     table.add_row(
         "total cost (USD, simulated)" if args.demo else "total cost (USD)",
@@ -187,6 +245,7 @@ def main(argv: list[str] | None = None) -> int:
     console.print(f"  {thesis_path}")
     console.print(f"  {memo_path}")
     console.print(f"  {diagram_path}")
+    console.print(f"  {audit_path}  [dim](every critique beside its answer)[/dim]")
     console.print(f"  {trace_path}")
 
     if args.publish_dir:

@@ -13,8 +13,12 @@ express:
     * schema violations
     * slug does not match the file name or the theme
     * a node without a source URL, or a missing value-chain layer
-    * a critique pointing at a node that is not in the tree, or a node that is
-      missing one of the three skeptic angles
+    * a critique pointing at a node that is not in the draft tree, or a draft
+      node that is missing one of the three skeptic angles
+    * obligated rebuttal (thesis_builder/protocol.py): a critique without
+      exactly one answer, or an answer whose claimed change (confidence
+      lowered, risk added, node dropped) is not visible in the diff between
+      ``draft_nodes`` and ``thesis.nodes``
     * more than 5 (or zero) investable picks
     * a Mermaid diagram that is not a ``graph``/``flowchart``
     * eval total that disagrees with the per-dimension scores
@@ -55,9 +59,11 @@ from thesis_builder.publish import (  # noqa: E402
     check_requirements,
     slugify,
 )
-from thesis_builder.schemas import CritiqueAngle  # noqa: E402
+from thesis_builder import protocol  # noqa: E402
+from thesis_builder.schemas import Critique, CritiqueAnswer, SkepticAngle  # noqa: E402
 
-ANGLES = set(get_args(CritiqueAngle))
+# Visitor challenges are extra critiques; coverage is about the Skeptic's three.
+ANGLES = set(get_args(SkepticAngle))
 DASH_RE = re.compile(r"[\u2014\u2013]")
 SECRET_RES = [
     re.compile(r"\bsk-[A-Za-z0-9_\-]{16,}"),          # OpenAI / Anthropic style
@@ -140,15 +146,32 @@ def validate_file(
     if missing_layers:
         errors.append(f"tree is missing layers: {sorted(missing_layers)}")
 
-    angles_by_node: dict[str, set[str]] = {n: set() for n in names}
+    # Critiques target the Researcher's draft tree (a conceded node may be dropped).
+    draft_names = {n.name for n in pub.draft_nodes}
+    if pub.critiques and not pub.draft_nodes:
+        errors.append("critiques present but draft_nodes is empty; the rebuttal check cannot run")
+    targets = draft_names or names
+    angles_by_node: dict[str, set[str]] = {n: set() for n in targets}
     for c in pub.critiques:
-        if c.node_name not in names:
+        if c.node_name not in targets:
             errors.append(f"critique targets unknown node {c.node_name!r}")
-        else:
+        elif c.angle in ANGLES:
             angles_by_node[c.node_name].add(c.angle)
-    for n, got in angles_by_node.items():
-        if got != ANGLES:
-            errors.append(f"node {n!r} is missing skeptic angles {sorted(ANGLES - got)}")
+    if pub.critiques:
+        for n, got in angles_by_node.items():
+            if got != ANGLES:
+                errors.append(f"node {n!r} is missing skeptic angles {sorted(ANGLES - got)}")
+
+    if pub.critiques and pub.draft_nodes:
+        crits = [Critique.model_validate(c.model_dump(exclude={"stance", "rebuttal", "changes"}))
+                 for c in pub.critiques]
+        answers = [CritiqueAnswer(critique_id=c.id, stance=c.stance, rebuttal=c.rebuttal,
+                                  changes=c.changes) for c in pub.critiques]
+        res = protocol.check(pub.draft_nodes, pub.thesis.nodes, crits, answers)
+        errors.extend(f"rebuttal check: {e}" for e in res.errors)
+        warnings.extend(f"rebuttal check: {w}" for w in res.warnings)
+        if pub.protocol is None or not pub.protocol.passed:
+            errors.append("protocol block missing or not passed")
 
     picks = pub.thesis.investable_picks
     if not 1 <= len(picks) <= 5:

@@ -1,0 +1,5 @@
+# Llama 3.3 70B with a 32k context window for Thesis Builder.
+#   ollama pull llama3.3:70b
+#   ollama create thesis-70b -f config/ollama/thesis-70b.Modelfile
+FROM llama3.3:70b
+PARAMETER num_ctx 32768

@@ -1,0 +1,5 @@
+# Llama 3.1 8B for the high-volume source summaries.
+#   ollama pull llama3.1:8b
+#   ollama create thesis-8b -f config/ollama/thesis-8b.Modelfile
+FROM llama3.1:8b
+PARAMETER num_ctx 16384

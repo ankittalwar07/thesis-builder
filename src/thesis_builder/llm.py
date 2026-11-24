@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import time
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -63,15 +64,54 @@ class TierConfig:
     temperature: float = 0.3
     timeout_s: int = 60
     enable_prompt_cache: bool = False
+    # Local or self-hosted models (Ollama, vLLM, LM Studio, a LiteLLM proxy):
+    # the server address, and how Instructor asks for structured output.
+    # "tools" (function calling) suits hosted APIs; "json" is more reliable on
+    # local open-weight models.
+    api_base: str | None = None
+    instructor_mode: str = "tools"
 
     @property
     def models(self) -> list[str]:
         return [self.primary, *self.fallbacks]
 
 
+DEFAULT_CONFIG = "config/models.yaml"
+_ENV_REF = re.compile(r"\$\{([A-Z0-9_]+)(?::-([^}]*))?\}")
+_MODES = {
+    "tools": "TOOLS",
+    "json": "JSON",
+    "md_json": "MD_JSON",
+    "json_schema": "JSON_SCHEMA",
+}
+
+
+def default_config_path() -> str:
+    """``THESIS_MODELS_CONFIG`` if set (e.g. config/models.local.yaml), else the hosted config."""
+    return os.environ.get("THESIS_MODELS_CONFIG") or DEFAULT_CONFIG
+
+
+def _expand_env(value: Any) -> Any:
+    """Expand ``${VAR}`` and ``${VAR:-default}`` in string config values."""
+    if isinstance(value, str):
+        return _ENV_REF.sub(lambda m: os.environ.get(m.group(1)) or (m.group(2) or ""), value)
+    if isinstance(value, dict):
+        return {k: _expand_env(v) for k, v in value.items()}
+    if isinstance(value, list):
+        return [_expand_env(v) for v in value]
+    return value
+
+
 def _load_config(path: str | Path) -> dict[str, Any]:
     with open(path) as f:
-        return yaml.safe_load(f)
+        return _expand_env(yaml.safe_load(f))
+
+
+def _instructor_mode(name: str) -> Any:
+    try:
+        return getattr(instructor.Mode, _MODES[name.lower()])
+    except KeyError as e:
+        raise ValueError(f"unknown instructor_mode {name!r}; use one of {sorted(_MODES)}") from e
 
 
 # --- Trace writer -----------------------------------------------------------
@@ -136,11 +176,12 @@ class BudgetExceeded(RuntimeError):
 class LLMClient:
     def __init__(
         self,
-        config_path: str | Path = "config/models.yaml",
+        config_path: str | Path | None = None,
         trace: TraceWriter | None = None,
         max_cost_usd: float | None = None,
     ) -> None:
-        cfg = _load_config(config_path)
+        self.config_path = str(config_path or default_config_path())
+        cfg = _load_config(self.config_path)
         self._tiers: dict[str, TierConfig] = {
             name: TierConfig(**spec) for name, spec in cfg["tiers"].items()
         }
@@ -192,6 +233,7 @@ class LLMClient:
             try:
                 if response_model is not None:
                     result, usage_info = self._instructor_call(
+                        tcfg=tcfg,
                         model=model,
                         messages=prepared,
                         response_model=response_model,
@@ -201,6 +243,7 @@ class LLMClient:
                     )
                 else:
                     result, usage_info = self._raw_call(
+                        tcfg=tcfg,
                         model=model,
                         messages=prepared,
                         max_tokens=max_tokens or tcfg.max_tokens,
@@ -251,6 +294,7 @@ class LLMClient:
 
     def _instructor_call(
         self,
+        tcfg: TierConfig,
         model: str,
         messages: list[dict[str, Any]],
         response_model: type[BaseModel],
@@ -258,7 +302,7 @@ class LLMClient:
         temperature: float,
         timeout: int,
     ) -> tuple[BaseModel, dict[str, Any]]:
-        client = instructor.from_litellm(litellm_completion)
+        client = instructor.from_litellm(litellm_completion, mode=_instructor_mode(tcfg.instructor_mode))
         max_retries = int(self._instructor_cfg.get("max_retries", 3))
         # instructor returns (obj, raw_completion) when using create_with_completion;
         # we want both so we can extract usage / cost from the raw side.
@@ -270,12 +314,14 @@ class LLMClient:
             max_tokens=max_tokens,
             temperature=temperature,
             timeout=timeout,
+            **_endpoint_kwargs(tcfg),
         )
         usage = _usage_from_response(raw)
         return obj, usage
 
     def _raw_call(
         self,
+        tcfg: TierConfig,
         model: str,
         messages: list[dict[str, Any]],
         max_tokens: int,
@@ -288,6 +334,7 @@ class LLMClient:
             max_tokens=max_tokens,
             temperature=temperature,
             timeout=timeout,
+            **_endpoint_kwargs(tcfg),
         )
         text = resp.choices[0].message.content or ""
         return text, _usage_from_response(resp)
@@ -325,6 +372,11 @@ class LLMClient:
 
 
 # --- Helpers ----------------------------------------------------------------
+
+
+def _endpoint_kwargs(tcfg: TierConfig) -> dict[str, Any]:
+    return {"api_base": tcfg.api_base} if tcfg.api_base else {}
+
 
 
 def _apply_prompt_cache(messages: list[dict[str, Any]]) -> list[dict[str, Any]]:

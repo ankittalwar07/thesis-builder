@@ -20,7 +20,9 @@ from rich.console import Console
 
 from . import prompts
 from .agents import Researcher, Skeptic, Synthesizer
+from .agents.synthesizer import ProtocolHook
 from .llm import LLMClient
+from .protocol import ProtocolResult, assign_ids
 from .schemas import FinalOutput, ResearchBundle, SkepticReport, SourceSummary
 from .tools import CacheBundle, WebSearch
 
@@ -30,6 +32,8 @@ class ThesisState(TypedDict, total=False):
     research: ResearchBundle
     skeptic: SkepticReport
     final: FinalOutput
+    protocol: ProtocolResult
+    protocol_refused: list[str]
 
 
 def build_graph(
@@ -37,10 +41,22 @@ def build_graph(
     search: WebSearch,
     cache: CacheBundle,
     console: Console | None = None,
+    *,
+    skip_skeptic: bool = False,
+    on_protocol: ProtocolHook | None = None,
+    max_synth_attempts: int = 2,
 ):
+    """Build the Researcher -> Skeptic -> Synthesizer graph.
+
+    ``skip_skeptic`` replaces the Skeptic with an empty report (ablation: does
+    the critic change the published thesis?). ``on_protocol`` is called after
+    every Synthesizer attempt with the obligated-rebuttal check result.
+    """
     researcher = Researcher(llm=llm, search=search, cache=cache, console=console)
     skeptic = Skeptic(llm=llm, console=console)
-    synthesizer = Synthesizer(llm=llm, console=console)
+    synthesizer = Synthesizer(
+        llm=llm, console=console, max_attempts=max_synth_attempts, on_protocol=on_protocol
+    )
     budgets = llm.budgets
 
     def research_node(state: ThesisState) -> ThesisState:
@@ -63,6 +79,8 @@ def build_graph(
 
     def skeptic_node(state: ThesisState) -> ThesisState:
         bundle = state["research"]
+        if skip_skeptic:
+            return {"skeptic": SkepticReport(theme=bundle.theme, critiques=[]), "research": bundle}
         skeptic_budget = budgets.get("skeptic_context_tokens", 30_000)
         # The skeptic only sees per-critique evidence packs (4 summaries each),
         # so the budget guard here is a defensive trim of the input bundle
@@ -78,6 +96,8 @@ def build_graph(
                 }
             )
         report = skeptic.run(bundle)
+        # Stable ids so the Synthesizer can answer each critique by name.
+        report = report.model_copy(update={"critiques": assign_ids(report.critiques)})
         return {"skeptic": report, "research": bundle}
 
     def synth_node(state: ThesisState) -> ThesisState:
@@ -101,8 +121,17 @@ def build_graph(
                     )
                 }
             )
-        final = synthesizer.run(bundle, skeptic_report)
-        return {"final": final}
+        refused: list[str] = []
+
+        def hook(attempt: int, res: ProtocolResult) -> None:
+            if not res.passed:
+                refused.extend(f"attempt {attempt}: {e}" for e in res.errors)
+            if on_protocol is not None:
+                on_protocol(attempt, res)
+
+        synthesizer.on_protocol = hook
+        final, result = synthesizer.run_checked(bundle, skeptic_report)
+        return {"final": final, "protocol": result, "protocol_refused": refused}
 
     g = StateGraph(ThesisState)
     g.add_node("researcher", research_node)

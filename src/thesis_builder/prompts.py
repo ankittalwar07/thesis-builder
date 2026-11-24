@@ -1,7 +1,8 @@
 """Versioned prompts.
 
 Every prompt string carries a version suffix. The active version is selected
-by ``THESIS_PROMPT_VERSION`` (defaults to ``v1``). Cache keys for both web
+by ``THESIS_PROMPT_VERSION`` (defaults to ``v2``; v2 adds the obligated
+rebuttal contract to the synthesizer prompts and is otherwise identical to v1). Cache keys for both web
 results and source extractions include the prompt version so editing a
 prompt invalidates downstream caches cleanly.
 """
@@ -10,7 +11,7 @@ from __future__ import annotations
 
 import os
 
-ACTIVE_VERSION = os.environ.get("THESIS_PROMPT_VERSION", "v1")
+ACTIVE_VERSION = os.environ.get("THESIS_PROMPT_VERSION", "v2")
 
 
 # --- Researcher planner -----------------------------------------------------
@@ -194,6 +195,53 @@ SYNTHESIZER_USER_V1 = """Theme: {theme}
 Write the final `FinalOutput` now."""
 
 
+# --- v2: obligated rebuttal -------------------------------------------------
+
+_REBUTTAL_CONTRACT = """
+
+## Obligated rebuttal (checked before anything is published)
+
+Every skeptic critique has an id (C1, C2, ... or V1, V2, ... for challenges typed
+by a person). Return `answers`: exactly ONE `CritiqueAnswer` per id, no more, no
+fewer, each with:
+
+- `critique_id`: the id.
+- `stance`:
+  - `held`: the bull case survives this critique. Leave the node in the tree and
+    do not change it because of this critique. `changes` must be empty.
+  - `partial`: the concern is real but bounded. Keep the node and carry the
+    concern into the memo's "What we'd have to be wrong about" section. You may
+    also lower confidence or add a risk; if you do, list it in `changes`.
+  - `conceded`: you changed the node because of this critique. `changes` must
+    list what you did: `confidence_lowered` (final confidence below the draft),
+    `risk_added` (a new entry in the node's `risks`), or `dropped` (the node is
+    not in the final tree).
+- `rebuttal`: one or two sentences. For `conceded`, say exactly what changed.
+
+A plain-Python checker compares the draft tree with your final tree. It refuses
+to publish if any critique is unanswered, or if any change you claim is not in
+the final tree (for example, `confidence_lowered` while the confidence is
+unchanged). Keep node names identical to the draft so the diff lines up."""
+
+SYNTHESIZER_SYSTEM_V2 = SYNTHESIZER_SYSTEM_V1.replace(
+    "Return a `FinalOutput` with three parts:",
+    "Return a `FinalOutput` with four parts (the fourth, `answers`, is described at the end):",
+) + _REBUTTAL_CONTRACT
+
+SYNTHESIZER_USER_V2 = """Theme: {theme}
+
+## Research summaries
+{research_block}
+
+## Draft tree from researcher
+{draft_tree_block}
+
+## Critiques to answer (one answer per id)
+{skeptic_block}
+
+Write the final `FinalOutput` now, including `answers`."""
+
+
 # --- Version registry -------------------------------------------------------
 
 _REGISTRY: dict[str, dict[str, str]] = {
@@ -213,6 +261,41 @@ _REGISTRY: dict[str, dict[str, str]] = {
         "synthesizer_system": SYNTHESIZER_SYSTEM_V1,
         "synthesizer_user": SYNTHESIZER_USER_V1,
     },
+}
+CHALLENGE_SYSTEM_V2 = """You are the Synthesizer of a published value-chain thesis. A person has
+challenged one node. You must answer the challenge on the record, under the
+same rule as every other critique: a stance, a rebuttal, and only the changes
+you actually make to that node.
+
+Return a `ChallengeReply`:
+- `answer`: one `CritiqueAnswer` for the challenge id, with `stance` held,
+  partial or conceded, a one or two sentence `rebuttal` that engages the
+  person's argument and the node's evidence, and `changes` drawn only from
+  `confidence_lowered`, `risk_added`, `dropped`.
+- `node`: the node as it should now read. Keep its `name` exactly. If you lower
+  confidence or add a risk, do it here. Set `node` to null only if you drop it.
+
+Held means the node is returned unchanged. Do not invent evidence: if the
+challenge raises something the sources do not cover, say so and record it as a
+risk rather than claiming it is wrong. A plain-Python checker compares the node
+before and after and refuses any change you claim but did not make."""
+
+CHALLENGE_USER_V2 = """Theme: {theme}
+
+## The node being challenged (as published)
+{node_block}
+
+## The challenge ({critique_id}, typed by a visitor)
+{argument}
+
+Answer {critique_id}."""
+
+_REGISTRY["v2"] = {
+    **_REGISTRY["v1"],
+    "synthesizer_system": SYNTHESIZER_SYSTEM_V2,
+    "synthesizer_user": SYNTHESIZER_USER_V2,
+    "challenge_system": CHALLENGE_SYSTEM_V2,
+    "challenge_user": CHALLENGE_USER_V2,
 }
 
 

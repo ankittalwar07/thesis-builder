@@ -127,12 +127,20 @@ class NodeList(BaseModel):
 # --- Internal: skeptic ------------------------------------------------------
 
 
-CritiqueAngle = Literal["bottleneck_vs_commodity", "substitution_risk", "priced_in"]
+SkepticAngle = Literal["bottleneck_vs_commodity", "substitution_risk", "priced_in"]
+# "visitor" marks a challenge typed in by a person at the live demo. It enters
+# the same protocol as the Skeptic's critiques, but the Skeptic never uses it.
+CritiqueAngle = Literal["bottleneck_vs_commodity", "substitution_risk", "priced_in", "visitor"]
 
 
 class Critique(BaseModel):
     """One angle of attack on one node."""
 
+    id: str = Field(
+        default="",
+        description="Stable id (C1, C2, ... for the Skeptic, V1, V2, ... for visitors). "
+        "The Synthesizer answers critiques by id.",
+    )
     node_name: str
     angle: CritiqueAngle
     verdict: Literal["weak", "mixed", "strong"]
@@ -157,13 +165,43 @@ class SkepticReport(BaseModel):
 # --- Internal: synthesizer output ------------------------------------------
 
 
+Stance = Literal["held", "partial", "conceded"]
+ChangeKind = Literal["confidence_lowered", "risk_added", "dropped"]
+
+
+class CritiqueAnswer(BaseModel):
+    """The Synthesizer's on-the-record answer to one critique (obligated rebuttal).
+
+    ``changes`` lists what the Synthesizer says it did to the target node. The
+    protocol checker (``protocol.py``) verifies each claim against the diff
+    between the draft tree and the final tree.
+    """
+
+    critique_id: str
+    stance: Stance = Field(
+        description="held = bull case defended, node kept unchanged by this critique; "
+        "partial = concern is real but bounded, carried into the memo, node kept; "
+        "conceded = the node was changed (see changes)."
+    )
+    rebuttal: str = Field(min_length=1, description="One or two sentences answering the critique.")
+    changes: list[ChangeKind] = Field(
+        default_factory=list,
+        description="Required and non-empty when stance is conceded; empty when held.",
+    )
+
+
 class FinalOutput(BaseModel):
-    """What the synthesizer produces: structured thesis + two text artifacts."""
+    """What the synthesizer produces: structured thesis + two text artifacts,
+    plus one answer per critique."""
 
     thesis: Thesis
     memo_md: str = Field(description="Full markdown memo, ready to write to memo.md.")
     diagram_mmd: str = Field(
         description="Mermaid graph source, ready to write to diagram.mmd."
+    )
+    answers: list[CritiqueAnswer] = Field(
+        default_factory=list,
+        description="Exactly one answer per critique id in the skeptic block.",
     )
 
 
@@ -207,3 +245,13 @@ class TraceEvent(BaseModel):
     latency_ms: int | None = None
     cache_key: str | None = None
     note: str | None = None
+
+
+class ChallengeReply(BaseModel):
+    """The Synthesizer's answer to one visitor challenge: the answer, and the
+    challenged node as it now reads (None if dropped). Small on purpose, so a
+    challenge can be answered in a minute or two even on a local model."""
+
+    answer: CritiqueAnswer
+    node: Node | None = None
+

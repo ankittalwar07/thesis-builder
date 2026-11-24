@@ -24,13 +24,14 @@ from ..llm import LLMClient
 from ..schemas import (
     Critique,
     CritiqueAngle,
+    SkepticAngle,
     Node,
     ResearchBundle,
     SkepticReport,
     SourceSummary,
 )
 
-ANGLES: tuple[CritiqueAngle, ...] = get_args(CritiqueAngle)
+ANGLES: tuple[CritiqueAngle, ...] = get_args(SkepticAngle)
 
 
 class Skeptic:

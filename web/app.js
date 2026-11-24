@@ -9,6 +9,8 @@
   ];
 
   let currentRunId = null;
+  let lastResult = null;
+  let challengeNode = null;
   let eventSource = null;
   let stageCounters = { researcher: 0, skeptic: 0, synthesizer: 0 };
   let llmCalls = 0;
@@ -36,8 +38,18 @@
     .then((r) => r.json())
     .then((cfg) => {
       const badge = $("mode-badge");
-      badge.textContent = cfg.default_demo ? "demo" : "live";
-      badge.classList.add(cfg.default_demo ? "demo" : "live");
+      const mode = cfg.replay ? "replay" : cfg.default_demo ? "demo" : "live";
+      badge.textContent = cfg.replay ? "offline replay of recorded runs" : mode;
+      badge.classList.add(mode);
+      if (!cfg.default_demo || cfg.replay) $("refusal-toggle").hidden = true;
+      if (cfg.replay && cfg.replay_themes && cfg.replay_themes.length) {
+        document.querySelector(".presets").innerHTML =
+          "<span>recorded:</span>" +
+          cfg.replay_themes.map((t) => `<button class="preset" data-theme="${escapeHtml(t)}">${escapeHtml(t)}</button>`).join("");
+        document.querySelectorAll(".preset").forEach((b) =>
+          b.addEventListener("click", () => { $("theme-input").value = b.dataset.theme; })
+        );
+      }
       const keys = [];
       if (cfg.has_anthropic) keys.push("anthropic");
       if (cfg.has_groq) keys.push("groq");
@@ -64,7 +76,7 @@
     const resp = await fetch("/api/run", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ theme, demo: cfg.default_demo }),
+      body: JSON.stringify({ theme, demo: cfg.default_demo, show_refusal: $("show-refusal").checked }),
     });
     if (!resp.ok) {
       alert("failed to start run: " + (await resp.text()));
@@ -87,6 +99,9 @@
     llmCalls = 0;
     searchCount = 0;
     $("trace-list").innerHTML = "";
+    lastResult = null;
+    setBanner("pending", "Synthesizer has not answered yet. Nothing is published until every critique has an answer the checker accepts.");
+    $("tab-critiques").innerHTML = '<div class="placeholder">Waiting for the Skeptic and the Synthesizer…</div>';
     $("tab-tree").innerHTML = '<div class="placeholder">Building tree…</div>';
     $("tab-memo").innerHTML = '<div class="placeholder">Synthesizing memo…</div>';
     $("tab-diagram").innerHTML = '<div class="placeholder">Diagram pending…</div>';
@@ -111,6 +126,11 @@
     eventSource.addEventListener("stage", (e) => onStage(JSON.parse(e.data)));
     eventSource.addEventListener("trace", (e) => onTrace(JSON.parse(e.data)));
     eventSource.addEventListener("done", (e) => onDone(JSON.parse(e.data)));
+    eventSource.addEventListener("protocol", (e) => onProtocol(JSON.parse(e.data)));
+    eventSource.addEventListener("challenge", (e) => {
+      const c = JSON.parse(e.data).critique;
+      setBanner("pending", `Visitor challenge ${c.id} on ${c.node_name}: the Synthesizer must answer it before anything is republished.`);
+    });
     eventSource.addEventListener("error", (e) => {
       try { onError(JSON.parse(e.data)); } catch { /* network blip */ }
     });
@@ -187,18 +207,115 @@
     }
   }
 
+  function onProtocol({ attempt, passed, errors }) {
+    if (passed) {
+      setBanner("ok", `Checker accepted attempt ${attempt}: every critique has exactly one answer, and every claimed change is in the tree.`);
+    } else {
+      setBanner(
+        "refused",
+        `Checker refused attempt ${attempt}. Nothing was published. The errors go back to the Synthesizer:`,
+        errors
+      );
+    }
+  }
+
+  function setBanner(kind, text, items) {
+    const b = $("protocol-banner");
+    b.hidden = false;
+    b.className = "protocol-banner " + kind;
+    b.innerHTML = escapeHtml(text) +
+      (items && items.length ? "<ul>" + items.map((x) => `<li>${escapeHtml(x)}</li>`).join("") + "</ul>" : "");
+  }
+
   function onError({ note }) {
     alert("run failed: " + note);
   }
 
   function renderResult(res) {
-    if (!res || !res.thesis) return;
+    if (!res) return;
+    lastResult = res;
+    const p = res.protocol || {};
+    if (!res.published) {
+      setBanner("refused", `Refused after ${p.attempts || 1} attempt(s). Nothing was published.`, p.errors || []);
+      renderCritiques(res);
+      return;
+    }
+    const refusedNote = (p.refused || []).length
+      ? ` An earlier attempt was refused (${p.refused.length} error${p.refused.length > 1 ? "s" : ""}) and corrected.`
+      : "";
+    const replayNote = res.replay
+      ? ` Offline replay of a ${res.recorded_mode || ""} run recorded ${res.recorded_at || ""}; visitor challenges are answered by an offline rule-based Synthesizer.`
+      : "";
+    setBanner(
+      "ok",
+      `Published. ${res.critiques.length} critiques, each answered once; every claimed change checked against the draft tree.` +
+        refusedNote + replayNote,
+      (p.refused || []).length ? p.refused : null
+    );
+    if (!res.thesis) return;
     renderTree(res.thesis);
+    renderCritiques(res);
     renderMemo(res.memo_md);
     renderDiagram(res.diagram_mmd);
     renderPicks(res.thesis.investable_picks || []);
-    $("json-out").textContent = JSON.stringify(res.thesis, null, 2);
+    $("json-out").textContent = JSON.stringify(res, null, 2);
   }
+
+  function renderCritiques(res) {
+    const root = $("tab-critiques");
+    const crits = (res.critiques || []).slice().sort((a, b) =>
+      (a.angle === "visitor") === (b.angle === "visitor")
+        ? a.node_name.localeCompare(b.node_name) || a.angle.localeCompare(b.angle)
+        : a.angle === "visitor" ? -1 : 1
+    );
+    if (!crits.length) {
+      root.innerHTML = '<div class="placeholder">No critiques in this run (the Skeptic was skipped).</div>';
+      return;
+    }
+    root.innerHTML = crits.map((c) => `
+      <div class="crit-row ${c.angle === "visitor" ? "visitor" : ""}">
+        <div class="crit-side">
+          <div class="crit-meta">${escapeHtml(c.id)} · ${escapeHtml(c.node_name)} · ${escapeHtml(c.angle.replaceAll("_", " "))} · verdict ${escapeHtml(c.verdict)}</div>
+          ${escapeHtml(c.argument)}
+        </div>
+        <div class="crit-side">
+          <div class="crit-meta">
+            ${c.stance ? `<span class="stance ${c.stance}">${c.stance}</span>` : "<em>no answer</em>"}
+            ${(c.changes || []).map((x) => `<span class="change">${escapeHtml(x.replaceAll("_", " "))}</span>`).join("")}
+          </div>
+          ${escapeHtml(c.rebuttal || "")}
+        </div>
+      </div>`).join("");
+  }
+
+  // ---- visitor challenge ----
+  function openChallenge(nodeName) {
+    if (!lastResult || !lastResult.published || !currentRunId) return;
+    challengeNode = nodeName;
+    $("challenge-node").textContent = nodeName;
+    $("challenge-text").value = "";
+    $("challenge-dialog").showModal();
+  }
+
+  $("challenge-dialog").addEventListener("close", async () => {
+    if ($("challenge-dialog").returnValue !== "send") return;
+    const argument = $("challenge-text").value.trim();
+    if (!argument || !challengeNode) return;
+    const resp = await fetch(`/api/challenge/${currentRunId}`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ node_name: challengeNode, argument }),
+    });
+    if (!resp.ok) {
+      alert("challenge failed: " + (await resp.text()));
+      return;
+    }
+    const { run_id } = await resp.json();
+    currentRunId = run_id;
+    markStage("synthesizer", "active", "answering the visitor…");
+    openStream(run_id);
+    document.querySelector('.tab[data-tab="critiques"]').click();
+  });
 
   function renderTree(thesis) {
     const root = $("tab-tree");
@@ -250,7 +367,9 @@
           ? `<div class="node-row"><strong>sources:</strong> <span>${(n.sources || []).map((u) => `<a href="${escapeHtml(u)}" target="_blank">${shortUrl(u)}</a>`).join("  ")}</span></div>`
           : ""
       }
+      <button class="challenge-btn">Challenge this node</button>
     `;
+    el.querySelector(".challenge-btn").addEventListener("click", () => openChallenge(n.name));
     return el;
   }
 
