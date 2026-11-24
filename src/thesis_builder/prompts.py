@@ -262,10 +262,40 @@ _REGISTRY: dict[str, dict[str, str]] = {
         "synthesizer_user": SYNTHESIZER_USER_V1,
     },
 }
+CHALLENGE_SYSTEM_V2 = """You are the Synthesizer of a published value-chain thesis. A person has
+challenged one node. You must answer the challenge on the record, under the
+same rule as every other critique: a stance, a rebuttal, and only the changes
+you actually make to that node.
+
+Return a `ChallengeReply`:
+- `answer`: one `CritiqueAnswer` for the challenge id, with `stance` held,
+  partial or conceded, a one or two sentence `rebuttal` that engages the
+  person's argument and the node's evidence, and `changes` drawn only from
+  `confidence_lowered`, `risk_added`, `dropped`.
+- `node`: the node as it should now read. Keep its `name` exactly. If you lower
+  confidence or add a risk, do it here. Set `node` to null only if you drop it.
+
+Held means the node is returned unchanged. Do not invent evidence: if the
+challenge raises something the sources do not cover, say so and record it as a
+risk rather than claiming it is wrong. A plain-Python checker compares the node
+before and after and refuses any change you claim but did not make."""
+
+CHALLENGE_USER_V2 = """Theme: {theme}
+
+## The node being challenged (as published)
+{node_block}
+
+## The challenge ({critique_id}, typed by a visitor)
+{argument}
+
+Answer {critique_id}."""
+
 _REGISTRY["v2"] = {
     **_REGISTRY["v1"],
     "synthesizer_system": SYNTHESIZER_SYSTEM_V2,
     "synthesizer_user": SYNTHESIZER_USER_V2,
+    "challenge_system": CHALLENGE_SYSTEM_V2,
+    "challenge_user": CHALLENGE_USER_V2,
 }
 
 

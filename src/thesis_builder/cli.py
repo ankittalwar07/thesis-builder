@@ -27,7 +27,7 @@ except Exception:
     pass
 
 from .graph import build_graph
-from .llm import BudgetExceeded, LLMClient, TraceWriter
+from .llm import BudgetExceeded, LLMClient, TraceWriter, default_config_path
 from .schemas import FinalOutput
 from .tools import CacheBundle, WebSearch
 
@@ -50,8 +50,9 @@ def main(argv: list[str] | None = None) -> int:
     )
     parser.add_argument(
         "--config",
-        default="config/models.yaml",
-        help="Model tier config (default: config/models.yaml)",
+        default=default_config_path(),
+        help="Model tier config (default: THESIS_MODELS_CONFIG or config/models.yaml; "
+        "config/models.local.yaml runs on a local model server)",
     )
     parser.add_argument(
         "--cache-dir",

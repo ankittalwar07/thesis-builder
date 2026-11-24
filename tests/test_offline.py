@@ -229,3 +229,97 @@ def test_server_replays_a_recorded_run_offline(tmp_path, monkeypatch):
                         json={"node_name": node, "argument": "A cheaper substitute is coming."}).json()
     cres = _wait(client, child["run_id"]).json()
     assert cres["replay"] and any(c["angle"] == "visitor" for c in cres["critiques"])
+
+
+# --- Local model server config ----------------------------------------------
+
+
+def test_local_config_routes_every_tier_to_the_local_server(monkeypatch):
+    from pydantic import BaseModel
+
+    from thesis_builder import llm as llm_mod
+
+    monkeypatch.setenv("OLLAMA_API_BASE", "http://192.168.1.50:11434")
+    client = llm_mod.LLMClient(config_path=ROOT / "config" / "models.local.yaml")
+    for tier in ("small", "reasoning", "quality"):
+        cfg = client.tier(tier)
+        assert cfg.primary.startswith("ollama_chat/")
+        assert cfg.api_base == "http://192.168.1.50:11434"
+        assert cfg.instructor_mode == "json" and not cfg.enable_prompt_cache
+
+    seen = {}
+
+    class Out(BaseModel):
+        ok: bool
+
+    class FakeCompletions:
+        def create_with_completion(self, **kw):
+            seen.update(kw)
+
+            class Raw:
+                usage = None
+
+            return Out(ok=True), Raw()
+
+    class FakeClient:
+        class chat:
+            completions = FakeCompletions()
+
+    def fake_from_litellm(completion, mode):
+        seen["mode"] = mode
+        return FakeClient()
+
+    monkeypatch.setattr(llm_mod.instructor, "from_litellm", fake_from_litellm)
+    assert client.complete(tier="quality", messages=[{"role": "user", "content": "hi"}],
+                           response_model=Out).ok
+    assert seen["api_base"] == "http://192.168.1.50:11434"
+    assert seen["mode"] == llm_mod.instructor.Mode.JSON
+    assert seen["model"] == "ollama_chat/thesis-70b"
+
+
+def test_config_env_default_and_selection(monkeypatch):
+    from thesis_builder import llm as llm_mod
+
+    monkeypatch.delenv("OLLAMA_API_BASE", raising=False)
+    cfg = llm_mod._load_config(ROOT / "config" / "models.local.yaml")
+    assert cfg["tiers"]["small"]["api_base"] == "http://localhost:11434"
+    monkeypatch.setenv("THESIS_MODELS_CONFIG", "config/models.local.yaml")
+    assert llm_mod.default_config_path() == "config/models.local.yaml"
+    hosted = llm_mod._load_config(ROOT / "config" / "models.yaml")
+    assert "api_base" not in hosted["tiers"]["quality"]
+
+
+def test_live_challenge_rewrites_only_the_node_and_is_checked():
+    from thesis_builder.agents.synthesizer import Synthesizer
+    from thesis_builder.schemas import ChallengeReply, Critique, CritiqueAnswer, Node
+
+    a = Node(name="HBM", layer="enabling", description="d", confidence=0.8,
+             sources=["https://a.test/x"])
+    b = Node(name="Fabs", layer="raw_inputs", description="d", confidence=0.7,
+             sources=["https://a.test/y"])
+    v = Critique(id="V1", node_name="HBM", angle="visitor", verdict="weak",
+                 argument="Already priced in.")
+    replies = [
+        # First attempt claims a lower confidence but returns the node unchanged.
+        ChallengeReply(answer=CritiqueAnswer(critique_id="V1", stance="conceded",
+                                             rebuttal="Lowered.", changes=["confidence_lowered"]),
+                       node=a),
+        ChallengeReply(answer=CritiqueAnswer(critique_id="V1", stance="conceded",
+                                             rebuttal="Lowered to 0.7.", changes=["confidence_lowered"]),
+                       node=a.model_copy(update={"confidence": 0.7})),
+    ]
+
+    class FakeLLM:
+        calls = []
+
+        def complete(self, tier, messages, response_model):
+            self.calls.append(messages)
+            assert response_model is ChallengeReply
+            return replies[len(self.calls) - 1]
+
+    llm = FakeLLM()
+    nodes, answer, res = Synthesizer(llm=llm).answer_challenge("AI infra", [a, b], v)
+    assert res.passed and res.attempts == 2
+    assert "Protocol check failed" in llm.calls[1][-1]["content"]
+    assert [n.name for n in nodes] == ["HBM", "Fabs"] and nodes[0].confidence == 0.7
+    assert nodes[1] == b and answer.critique_id == "V1"

@@ -274,8 +274,6 @@ def _run_challenge(run: Run, parent: Run, node_name: str, argument: str) -> None
         )
         run.push({"type": "stage", "stage": "synthesizer", "status": "started"})
         run.push({"type": "challenge", "critique": json.loads(visitor.model_dump_json())})
-        base = research.model_copy(update={"draft_nodes": pfinal.thesis.nodes})
-        report = SkepticReport(theme=skeptic.theme, critiques=[visitor])
 
         if run.demo or run.replay:
             # No model available: deterministic answer, clearly labeled.
@@ -297,8 +295,11 @@ def _run_challenge(run: Run, parent: Run, node_name: str, argument: str) -> None
                 llm=LLMClient(trace=trace),
                 on_protocol=lambda attempt, r: run.push(_protocol_event(attempt, r)),
             )
-            new_final, res = synth.run_checked(base, report)
-            ans = new_final.answers
+            # Only the challenged node is rewritten, so this takes one short call.
+            nodes, answer, res = synth.answer_challenge(parent.theme, pfinal.thesis.nodes, visitor)
+            new_final = pfinal.model_copy(deep=True)
+            new_final.thesis.nodes = nodes
+            ans = [answer]
 
         # Carry the earlier answers over and re-check them against the original draft.
         earlier = protocol.check(research.draft_nodes, new_final.thesis.nodes,
@@ -586,10 +587,17 @@ def main(argv: list[str] | None = None) -> int:
         help="Booth fallback: serve recorded runs from DIR. No network or API keys used; "
         "visitor challenges are answered by an offline rule-based Synthesizer.",
     )
+    parser.add_argument(
+        "--config", metavar="YAML",
+        help="Model tier config for live runs (e.g. config/models.local.yaml for a local model "
+        "server). Same as setting THESIS_MODELS_CONFIG.",
+    )
     parser.add_argument("--replay-speed", type=float, default=1.0,
                         help="Replay pacing multiplier (2 = twice as fast, 0 = instant).")
     args = parser.parse_args(argv)
 
+    if args.config:
+        os.environ["THESIS_MODELS_CONFIG"] = args.config
     default_demo = True
     if args.live:
         default_demo = False

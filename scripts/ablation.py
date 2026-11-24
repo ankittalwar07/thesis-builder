@@ -32,7 +32,7 @@ import yaml  # noqa: E402
 
 from thesis_builder.agents.synthesizer import Synthesizer  # noqa: E402
 from thesis_builder.graph import build_graph  # noqa: E402
-from thesis_builder.llm import LLMClient, TraceWriter  # noqa: E402
+from thesis_builder.llm import LLMClient, TraceWriter, default_config_path  # noqa: E402
 from thesis_builder.protocol import _norm  # noqa: E402
 from thesis_builder.publish import slugify  # noqa: E402
 from thesis_builder.schemas import Node, SkepticReport  # noqa: E402
@@ -92,7 +92,9 @@ def run_theme(theme: str, args: argparse.Namespace, out_root: Path) -> dict[str,
         "mode": "demo" if args.demo else "live",
         "critiques": len(skeptic.critiques),
         "stances": stances,
-        "rebuttal_check": {"passed": check.passed, "attempts": check.attempts},
+        "rebuttal_check": {"passed": check.passed, "attempts": check.attempts,
+                           "refused_errors": len(result.get("protocol_refused", []))},
+        "models": None if args.demo else {t: llm.tier(t).primary for t in ("small", "reasoning", "quality")},
         "with_skeptic": diff_counts(research.draft_nodes, with_final.thesis.nodes),
         "without_skeptic": diff_counts(research.draft_nodes, without_final.thesis.nodes),
         "cost_usd": round(trace.total_cost_usd, 4),
@@ -106,7 +108,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--themes", nargs="*", help="Default: every theme in routines/themes.yaml")
     ap.add_argument("--themes-file", default=str(ROOT / "routines" / "themes.yaml"))
     ap.add_argument("--demo", action="store_true", help="Stubbed LLM and search (no keys, no network).")
-    ap.add_argument("--config", default=str(ROOT / "config" / "models.yaml"))
+    ap.add_argument("--config", default=default_config_path(),
+                    help="config/models.local.yaml for a local model server")
     ap.add_argument("--cache-dir", default=str(ROOT / ".diskcache"))
     ap.add_argument("--max-cost", type=float, default=None, help="Per-theme cost cap in USD.")
     ap.add_argument("--out", default=str(ROOT / "outputs" / "ablation"))
@@ -119,17 +122,19 @@ def main(argv: list[str] | None = None) -> int:
     rows = [run_theme(t, args, out_root) for t in themes]
     (out_root / "summary.json").write_text(json.dumps(rows, indent=2) + "\n")
 
-    print(f"{'theme':24} {'crit':>5} {'dropped w/wo':>13} {'demoted w/wo':>13} {'risks+ w/wo':>12}")
+    print(f"{'theme':24} {'crit':>5} {'dropped w/wo':>13} {'demoted w/wo':>13} {'risks+ w/wo':>12} {'attempts':>8}")
     for r in rows:
         w, wo = r["with_skeptic"], r["without_skeptic"]
         print(f"{r['theme'][:24]:24} {r['critiques']:>5} "
               f"{len(w['dropped']):>6}/{len(wo['dropped']):<6} "
               f"{len(w['demoted']):>6}/{len(wo['demoted']):<6} "
-              f"{len(w['risks_added']):>5}/{len(wo['risks_added']):<6}")
-    print("\nLaTeX rows (Theme & Critiques & Nodes dropped & Nodes demoted & Judge):")
+              f"{len(w['risks_added']):>5}/{len(wo['risks_added']):<6} "
+              f"{r['rebuttal_check']['attempts']:>8}")
+    print("\nLaTeX rows (Theme & Critiques & Dropped & Demoted & Synth attempts & Judge):")
     for r in rows:
         w = r["with_skeptic"]
-        print(f"{r['theme']} & {r['critiques']} & {len(w['dropped'])} & {len(w['demoted'])} & TODO \\\\")
+        print(f"{r['theme']} & {r['critiques']} & {len(w['dropped'])} & {len(w['demoted'])} & "
+              f"{r['rebuttal_check']['attempts']} & TODO \\\\")
     if any(r["mode"] == "demo" for r in rows):
         print("\n(demo mode: stubbed models; these numbers are NOT results for the paper)")
     return 0

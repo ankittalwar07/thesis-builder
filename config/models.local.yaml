@@ -1,0 +1,52 @@
+# Model tiers for a local model server (Ollama by default). No API keys, no
+# per-token cost. Use it with:
+#
+#   uv run thesis "Robotics" --config config/models.local.yaml
+#   THESIS_MODELS_CONFIG=config/models.local.yaml uv run thesis-serve --live
+#
+# Setup steps for the machine are in LOCAL_MODELS.md. The two model names
+# below are created from the Modelfiles in config/ollama/, which give them a
+# larger context window than Ollama's default.
+#
+# The server address defaults to this machine. To use the box from another
+# computer (for example at a demo booth), set OLLAMA_API_BASE to its address.
+
+tiers:
+  small:
+    # Source summaries: many short calls, so a small fast model.
+    primary: ollama_chat/thesis-8b
+    api_base: ${OLLAMA_API_BASE:-http://localhost:11434}
+    instructor_mode: json
+    max_tokens: 512
+    temperature: 0.2
+    timeout_s: 600
+
+  reasoning:
+    # Planner, coverage audit, draft tree, Skeptic critiques.
+    primary: ollama_chat/thesis-70b
+    api_base: ${OLLAMA_API_BASE:-http://localhost:11434}
+    instructor_mode: json
+    max_tokens: 2048
+    temperature: 0.3
+    timeout_s: 1800
+
+  quality:
+    # Synthesizer: the final tree, memo, diagram and one answer per critique.
+    primary: ollama_chat/thesis-70b
+    api_base: ${OLLAMA_API_BASE:-http://localhost:11434}
+    instructor_mode: json
+    max_tokens: 8192
+    temperature: 0.4
+    timeout_s: 5400
+    enable_prompt_cache: false   # Anthropic-only feature
+
+# Smaller budgets than the hosted config: prompt reading is the slow part on a
+# local machine, and input plus output must fit the 32k window.
+budgets:
+  researcher_context_tokens: 16000
+  skeptic_context_tokens: 8000
+  synthesizer_context_tokens: 16000
+
+instructor:
+  max_retries: 2
+  escalate_to_quality_on_final_failure: true

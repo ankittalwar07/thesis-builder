@@ -19,7 +19,16 @@ from rich.console import Console
 from .. import prompts, protocol
 from ..llm import LLMClient
 from ..protocol import ProtocolResult
-from ..schemas import FinalOutput, ResearchBundle, SkepticReport, SourceSummary
+from ..schemas import (
+    ChallengeReply,
+    Critique,
+    CritiqueAnswer,
+    FinalOutput,
+    Node,
+    ResearchBundle,
+    SkepticReport,
+    SourceSummary,
+)
 
 # Called after every attempt with (attempt number, check result).
 ProtocolHook = Callable[[int, ProtocolResult], None]
@@ -92,6 +101,49 @@ class Synthesizer:
             msgs = msgs + [{"role": "user", "content": protocol.feedback(result)}]
         assert out is not None
         return out, result
+
+
+    def answer_challenge(
+        self, theme: str, nodes: list[Node], critique: Critique
+    ) -> tuple[list[Node], CritiqueAnswer, ProtocolResult]:
+        """Answer one visitor challenge without rewriting the whole thesis.
+
+        Only the challenged node can change. The same checker runs on the
+        before and after trees; a refused answer gets one retry with the errors.
+        """
+        target = next(n for n in nodes if n.name == critique.node_name)
+        msgs = [
+            {"role": "system", "content": prompts.get("challenge_system")},
+            {
+                "role": "user",
+                "content": prompts.get("challenge_user").format(
+                    theme=theme,
+                    node_block=target.model_dump_json(indent=2),
+                    critique_id=critique.id,
+                    argument=critique.argument,
+                ),
+            },
+        ]
+        result = ProtocolResult()
+        new_nodes, answer = nodes, None
+        for attempt in range(1, self.max_attempts + 1):
+            reply = self.llm.complete(tier="quality", messages=msgs, response_model=ChallengeReply)
+            answer = reply.answer.model_copy(update={"critique_id": critique.id})
+            new_nodes = []
+            for n in nodes:
+                if n.name != critique.node_name:
+                    new_nodes.append(n)
+                elif reply.node is not None:
+                    new_nodes.append(reply.node.model_copy(update={"name": n.name, "layer": n.layer}))
+            result = protocol.check(nodes, new_nodes, [critique], [answer])
+            result.attempts = attempt
+            if self.on_protocol is not None:
+                self.on_protocol(attempt, result)
+            if result.passed:
+                break
+            msgs = msgs + [{"role": "user", "content": protocol.feedback(result)}]
+        assert answer is not None
+        return new_nodes, answer, result
 
 
 # --- helpers ----------------------------------------------------------------

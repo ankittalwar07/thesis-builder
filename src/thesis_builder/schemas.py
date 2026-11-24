@@ -245,3 +245,13 @@ class TraceEvent(BaseModel):
     latency_ms: int | None = None
     cache_key: str | None = None
     note: str | None = None
+
+
+class ChallengeReply(BaseModel):
+    """The Synthesizer's answer to one visitor challenge: the answer, and the
+    challenged node as it now reads (None if dropped). Small on purpose, so a
+    challenge can be answered in a minute or two even on a local model."""
+
+    answer: CritiqueAnswer
+    node: Node | None = None
+

@@ -126,6 +126,15 @@ uv run python -m evals.run_eval                    # build + judge the three gol
 
 CLI outputs land in `outputs/<slug>/` (`thesis.json`, `memo.md`, `diagram.mmd`, `rebuttals.json`, `trace.jsonl`). `--publish-dir` also writes the JSON the Pages UI reads. Design targets for a live run: at least 15 searches and 30 unique sources, at least 3 critiques that change the synthesis, at least 80% of tokens on the two cheaper tiers, and under $0.40 per run (enforced by the cost cap).
 
+### Local open-weight models (free, on your own machine)
+
+`config/models.local.yaml` routes every tier to an Ollama server (Llama 3.3 70B for the Skeptic and Synthesizer, Llama 3.1 8B for source summaries), with JSON-mode structured output and smaller context budgets. Any tier can point at another OpenAI-compatible server through `api_base` and `instructor_mode` in the config. Step-by-step setup, including a speed check: [`LOCAL_MODELS.md`](LOCAL_MODELS.md).
+
+```bash
+uv run python scripts/check_models.py --config config/models.local.yaml
+uv run thesis "Robotics" --config config/models.local.yaml
+```
+
 ### Recording and offline replay (for a live booth)
 
 ```bash
@@ -171,10 +180,14 @@ thesis-builder/
 ├── scripts/
 │   ├── validate_thesis.py # no-LLM validator for docs/data
 │   ├── export_demo_data.py
-│   └── ablation.py        # with vs without Skeptic on the same research
+│   ├── ablation.py        # with vs without Skeptic on the same research
+│   └── check_models.py    # does every model tier answer, and how fast
 ├── tests/                 # offline tests run in CI
 ├── web/                   # live pipeline UI served by thesis-serve
-└── config/models.yaml     # model tiers + fallbacks for the live path
+└── config/
+    ├── models.yaml        # hosted model tiers + fallbacks for the live path
+    ├── models.local.yaml  # the same tiers on a local Ollama server
+    └── ollama/            # Modelfiles that set a larger context window
 ```
 
 ## More multi-agent projects
