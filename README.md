@@ -43,13 +43,26 @@ flowchart LR
 |---|---|
 | **Researcher** | Plans searches across the four layers, summarizes each source in a map-reduce pass, loops until a coverage audit passes, then drafts the node tree with citations. |
 | **Skeptic** | Critiques every draft node from three angles (bottleneck vs. commodity, substitution risk, priced in) in parallel, each with its own evidence pack, then rolls the critiques up into headline concerns. |
-| **Synthesizer** | Merges research and critiques into the final thesis, demotes or drops what the Skeptic broke, answers each critique (held, partly conceded, conceded), and writes the memo and Mermaid diagram. |
+| **Synthesizer** | Merges research and critiques into the final thesis, demotes or drops what the Skeptic broke, answers each critique by id (held, partly conceded, conceded, with the changes it made), and writes the memo and Mermaid diagram. A model-free checker refuses to publish if any answer is missing or claims a change the tree does not show. |
 
 Every hand-off is a Pydantic model ([`schemas.py`](src/thesis_builder/schemas.py)), and every prompt is versioned in one registry ([`prompts.py`](src/thesis_builder/prompts.py)), so the same contracts drive the live LLM path, the offline demo, and the Claude routine.
 
 ## Design highlights
 
-**An adversarial skeptic that changes the answer, not just the tone.** Each node gets three independent attacks, each fed only the four most relevant sources for that node (scored by entity overlap, layer match and relevance in [`skeptic.py`](src/thesis_builder/agents/skeptic.py)). A `weak` verdict must state a failure mode and forces the Synthesizer to demote confidence or drop the node. The Synthesizer must publish a rebuttal for every critique, and the UI shows each critique next to its answer, so a reader can audit whether the pushback was handled honestly.
+**An adversarial skeptic that changes the answer, not just the tone.** Each node gets three independent attacks, each fed only the four most relevant sources for that node (scored by entity overlap, layer match and relevance in [`skeptic.py`](src/thesis_builder/agents/skeptic.py)). A `weak` verdict must state a failure mode.
+
+**Obligated rebuttal: the critic's objections are binding.** Every critique gets an id, and the Synthesizer must answer each one exactly once with a stance (held, partly conceded, conceded), a rebuttal and the changes it claims to have made. A checker with no language model in it ([`protocol.py`](src/thesis_builder/protocol.py)) compares the Researcher's draft tree with the final tree before anything is published:
+
+| Rule | What it checks |
+|---|---|
+| R1 coverage | every critique has exactly one answer, and no answer points at a critique that does not exist |
+| R2 grounding | every critique targets a node in the draft tree |
+| R3 commitment consistency | a concession claims at least one change, and each claimed change is real: confidence lowered, a new risk on the node, or the node dropped; a held or partial answer keeps the node |
+| R4 disclosure | the published file carries every critique beside its answer, plus the draft tree, so anyone can re-run the check ([`validate_thesis.py`](scripts/validate_thesis.py)) |
+
+If the answers fail, nothing is published: the errors go back to the Synthesizer for one more attempt, and the published file records any refused attempt. `uv run thesis --demo --demo-fault "Robotics"` shows a refusal and the correction offline.
+
+**The audience as a fourth critic.** In the live UI (`thesis-serve`), every node card has a "Challenge this node" button. A visitor's challenge becomes one more critique (`V1`, `V2`, ...) that the Synthesizer must answer under the same rules, and the answers to the earlier critiques are re-checked so a revision cannot quietly undo a concession.
 
 **An eval harness with golden specs.** [`evals/golden/`](evals/golden) defines hard requirements per theme (minimum nodes and unique sources, all four layers present, at least one named company from each required cluster, minimum critiques). They are checked deterministically, with no LLM. On top of that, an LLM judge ([`evals/judges.py`](evals/judges.py)) scores coverage, specificity, novelty and actionability from 0 to 5 while seeing only the final thesis and memo, never the research notes, so it cannot simply re-summarize the inputs. The rubric is told that a generic thesis scores 2.
 
@@ -87,6 +100,8 @@ uv sync --extra dev
 # Offline demo: the real graph with stubbed LLM + search. No keys, no network.
 uv run thesis --demo "AI infrastructure"          # writes outputs/ai_infrastructure/
 uv run thesis-serve --demo                         # live pipeline UI at http://127.0.0.1:8000/
+uv run thesis --demo --demo-fault "Robotics"       # watch the rebuttal check refuse, then accept
+uv run python scripts/ablation.py --demo           # with vs without Skeptic, same research
 
 # The static GitHub Pages UI
 python3 -m http.server -d docs 8080                # open http://127.0.0.1:8080/
@@ -109,7 +124,20 @@ uv run thesis "AI infrastructure" --publish-dir docs/data
 uv run python -m evals.run_eval                    # build + judge the three golden themes
 ```
 
-CLI outputs land in `outputs/<slug>/` (`thesis.json`, `memo.md`, `diagram.mmd`, `trace.jsonl`). `--publish-dir` also writes the JSON the Pages UI reads. Design targets for a live run: at least 15 searches and 30 unique sources, at least 3 critiques that change the synthesis, at least 80% of tokens on the two cheaper tiers, and under $0.40 per run (enforced by the cost cap).
+CLI outputs land in `outputs/<slug>/` (`thesis.json`, `memo.md`, `diagram.mmd`, `rebuttals.json`, `trace.jsonl`). `--publish-dir` also writes the JSON the Pages UI reads. Design targets for a live run: at least 15 searches and 30 unique sources, at least 3 critiques that change the synthesis, at least 80% of tokens on the two cheaper tiers, and under $0.40 per run (enforced by the cost cap).
+
+### Recording and offline replay (for a live booth)
+
+```bash
+uv run thesis-serve --live --record runs/          # every finished run is saved with its timing
+uv run thesis-serve --replay runs/                 # no network: replays recorded runs
+```
+
+Replay streams the recorded events at their original pace and labels the page as a replay with the recording date. Visitor challenges still work in replay; with no model available they are answered by a deterministic rule-based Synthesizer, labeled as offline, under the same checker.
+
+### Does the Skeptic change the answer?
+
+`scripts/ablation.py` runs the Researcher and Skeptic once per theme, then the Synthesizer twice on the same research, with and without the critiques, and counts nodes dropped, demoted and given new risks. Holding the research fixed keeps search noise out of the comparison. `--demo` checks the script offline; those numbers are not results.
 
 ## CI
 
@@ -129,6 +157,7 @@ thesis-builder/
 │   ├── graph.py           # LangGraph wiring + token-budget trimming
 │   ├── schemas.py         # Pydantic contracts between agents
 │   ├── prompts.py         # versioned prompt registry
+│   ├── protocol.py        # obligated-rebuttal checker (R1 to R3), no LLM
 │   ├── publish.py         # JSON contract for the Pages UI
 │   ├── llm.py             # LiteLLM + Instructor gateway, cost tracking, prompt cache
 │   ├── tools.py           # web search, source fetch, EDGAR (disk-cached)
@@ -141,7 +170,8 @@ thesis-builder/
 │   └── run_eval.py
 ├── scripts/
 │   ├── validate_thesis.py # no-LLM validator for docs/data
-│   └── export_demo_data.py
+│   ├── export_demo_data.py
+│   └── ablation.py        # with vs without Skeptic on the same research
 ├── tests/                 # offline tests run in CI
 ├── web/                   # live pipeline UI served by thesis-serve
 └── config/models.yaml     # model tiers + fallbacks for the live path

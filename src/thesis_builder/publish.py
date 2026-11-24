@@ -24,11 +24,11 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 
-from .schemas import Critique, JudgeScores, Layer, Thesis
+from . import protocol
+from .schemas import ChangeKind, Critique, JudgeScores, Layer, Node, Stance, Thesis
 
 SCHEMA_VERSION = 1
 LAYERS: tuple[Layer, ...] = ("raw_inputs", "enabling", "integrators", "applications")
-Stance = Literal["held", "partial", "conceded"]
 GeneratedBy = Literal["claude-routine", "litellm-pipeline", "demo"]
 
 
@@ -49,6 +49,23 @@ class PublishedCritique(Critique):
         "conceded = node changed (demoted, risk added, or dropped)."
     )
     rebuttal: str = Field(min_length=1, description="One or two sentences answering the critique.")
+    changes: list[ChangeKind] = Field(
+        default_factory=list,
+        description="Changes the answer claims on the target node; the validator checks "
+        "each one against the draft_nodes to thesis.nodes diff.",
+    )
+
+
+class ProtocolBlock(BaseModel):
+    """Outcome of the obligated-rebuttal check (protocol.py) for this file."""
+
+    passed: bool
+    attempts: int = Field(default=1, ge=1, description="Synthesizer attempts before it passed.")
+    refused: list[str] = Field(
+        default_factory=list,
+        description="Errors from attempts that were refused before the published one.",
+    )
+    warnings: list[str] = Field(default_factory=list)
 
 
 class ResearchStats(BaseModel):
@@ -82,6 +99,12 @@ class PublishedThesis(BaseModel):
     sample: bool = False
     generated_by: GeneratedBy
     thesis: Thesis
+    draft_nodes: list[Node] = Field(
+        default_factory=list,
+        description="The Researcher's draft tree the critiques targeted. Needed to check "
+        "that every claimed change is real.",
+    )
+    protocol: ProtocolBlock | None = None
     memo_md: str
     diagram_mmd: str
     critiques: list[PublishedCritique] = Field(default_factory=list)
@@ -111,29 +134,12 @@ class PublishedIndex(BaseModel):
 # --- Builders ---------------------------------------------------------------
 
 
-def stance_for(verdict: str) -> Stance:
-    return {"strong": "held", "mixed": "partial"}.get(verdict, "conceded")  # type: ignore[return-value]
+class ProtocolRefused(RuntimeError):
+    """Raised when the Synthesizer's answers fail the obligated-rebuttal check."""
 
-
-def derived_rebuttal(c: Critique, final_conf: float | None, draft_conf: float | None) -> str:
-    """Rebuttal text for pipeline runs, derived from the verdict and the
-    confidence change the synthesizer actually made. The Claude routine
-    writes its own rebuttals instead."""
-    conf = f"{final_conf:.2f}" if final_conf is not None else "n/a"
-    if c.verdict == "strong":
-        return f"Defense holds under this angle; the node stays in the tree at confidence {conf}."
-    if c.verdict == "mixed":
-        return (
-            "Partly conceded. The concern is carried into the memo's "
-            f"'What we'd have to be wrong about' section; confidence {conf}."
-        )
-    change = c.suggested_change.strip() or "flag the failure mode as a key risk"
-    moved = (
-        f" (draft {draft_conf:.2f})"
-        if draft_conf is not None and final_conf is not None and abs(draft_conf - final_conf) > 1e-9
-        else ""
-    )
-    return f"Conceded. Skeptic's suggested change: {change}. Final confidence {conf}{moved}."
+    def __init__(self, result: protocol.ProtocolResult) -> None:
+        super().__init__("; ".join(result.errors) or "protocol check failed")
+        self.result = result
 
 
 _DASHES = re.compile(r"\s*[\u2014\u2013]\s*")
@@ -171,25 +177,31 @@ def from_pipeline(
     skeptic = result.get("skeptic")
     thesis: Thesis = final.thesis.model_copy(deep=True)
 
-    final_conf = {n.name: n.confidence for n in thesis.nodes}
-    draft_conf = {n.name: n.confidence for n in (research.draft_nodes if research else [])}
+    draft_nodes = [n.model_copy(deep=True) for n in (research.draft_nodes if research else [])]
+    raw_critiques = list(skeptic.critiques) if skeptic else []
+    answers = list(getattr(final, "answers", []) or [])
 
+    # Obligated rebuttal: never publish answers that fail the check.
+    check = result.get("protocol") or protocol.check(draft_nodes, thesis.nodes, raw_critiques, answers)
+    if not check.passed:
+        raise ProtocolRefused(check)
+    refused = list(result.get("protocol_refused", []))
+
+    by_id = {a.critique_id: a for a in answers}
     critiques: list[PublishedCritique] = []
-    for c in sorted(
-        skeptic.critiques if skeptic else [],
-        key=lambda c: (c.node_name, c.angle),
-    ):
+    for c in sorted(raw_critiques, key=lambda c: (c.node_name, c.angle, c.id)):
+        a = by_id[c.id]
         critiques.append(
             PublishedCritique(
+                id=c.id,
                 node_name=c.node_name,
                 angle=c.angle,
                 verdict=c.verdict,
                 argument=undash(c.argument),
                 suggested_change=undash(c.suggested_change),
-                stance=stance_for(c.verdict),
-                rebuttal=derived_rebuttal(
-                    c, final_conf.get(c.node_name), draft_conf.get(c.node_name)
-                ),
+                stance=a.stance,
+                rebuttal=undash(a.rebuttal),
+                changes=list(dict.fromkeys(a.changes)),
             )
         )
 
@@ -197,7 +209,7 @@ def from_pipeline(
     thesis.summary = undash(thesis.summary)
     thesis.investable_picks = [_undash_pick(p) for p in thesis.investable_picks]
     thesis.skeptic_notes = [undash(s) for s in thesis.skeptic_notes]
-    for n in thesis.nodes:
+    for n in [*thesis.nodes, *draft_nodes]:
         n.description = undash(n.description)
         n.catalysts = [undash(x) for x in n.catalysts]
         n.risks = [undash(x) for x in n.risks]
@@ -215,6 +227,13 @@ def from_pipeline(
         sample=sample,
         generated_by=generated_by,
         thesis=thesis,
+        draft_nodes=draft_nodes,
+        protocol=ProtocolBlock(
+            passed=True,
+            attempts=getattr(check, "attempts", 1),
+            refused=[undash(e) for e in refused],
+            warnings=[undash(w) for w in check.warnings],
+        ),
         memo_md=_undash_md(final.memo_md),
         diagram_mmd=undash(final.diagram_mmd),
         critiques=critiques,

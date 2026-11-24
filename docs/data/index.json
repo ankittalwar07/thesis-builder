@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-11-08T19:36:02Z",
+  "updated_at": "2026-11-24T07:34:26Z",
   "themes": [
     {
       "slug": "ai_infrastructure",
       "theme": "AI infrastructure",
       "file": "themes/ai_infrastructure.json",
-      "run_date": "2026-11-08",
+      "run_date": "2026-11-24",
       "sample": true,
       "generated_by": "demo",
       "nodes": 13,
@@ -17,7 +17,7 @@
       "slug": "energy_transition",
       "theme": "Energy transition",
       "file": "themes/energy_transition.json",
-      "run_date": "2026-11-08",
+      "run_date": "2026-11-24",
       "sample": true,
       "generated_by": "demo",
       "nodes": 10,
@@ -28,7 +28,7 @@
       "slug": "robotics",
       "theme": "Robotics",
       "file": "themes/robotics.json",
-      "run_date": "2026-11-08",
+      "run_date": "2026-11-24",
       "sample": true,
       "generated_by": "demo",
       "nodes": 10,

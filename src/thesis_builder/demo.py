@@ -25,6 +25,7 @@ from .llm import LLMClient, TraceWriter
 from .schemas import (
     CoverageReport,
     Critique,
+    CritiqueAnswer,
     FinalOutput,
     Node,
     NodeList,
@@ -559,8 +560,13 @@ class DemoLLM(LLMClient):
         theme: str,
         trace: TraceWriter | None = None,
         max_cost_usd: float | None = None,
+        fault_once: bool = False,
     ) -> None:
         # Skip super().__init__, we don't need the real config or LiteLLM.
+        # fault_once: the first Synthesizer attempt claims a concession it did
+        # not make, so the demo can show the protocol checker refusing it and
+        # the Synthesizer correcting itself on the second attempt.
+        self.fault_once = fault_once
         self.trace = trace or TraceWriter()
         self.max_cost_usd = max_cost_usd
         self._theme = theme
@@ -635,7 +641,7 @@ class DemoLLM(LLMClient):
         if name == "Critique":
             return self._critique(messages)
         if name == "FinalOutput":
-            return self._final_output()
+            return self._final_output(messages)
         if name == "_Headlines" or "Headlines" in name:
             # Skeptic rollup helper class.
             return response_model.model_validate({"headlines": self._pack.headlines})
@@ -740,8 +746,13 @@ class DemoLLM(LLMClient):
             suggested_change="demote confidence by 0.1" if verdict == "weak" else "",
         )
 
-    def _final_output(self) -> FinalOutput:
-        nodes = [Node.model_validate(n) for n in self._pack.nodes]
+    def _final_output(self, messages: list[dict[str, Any]]) -> FinalOutput:
+        text = "\n".join(str(m.get("content", "")) for m in messages if m.get("role") == "user")
+        retry = "Protocol check failed" in text
+        draft = [Node.model_validate(n) for n in self._pack.nodes]
+        critiques = parse_critique_block(text)
+        faulty = self.fault_once and not retry
+        nodes, answers = rule_based_answers(draft, critiques, fault=faulty)
         thesis = Thesis(
             theme=self._pack.theme,
             summary=self._pack.summary,
@@ -751,7 +762,93 @@ class DemoLLM(LLMClient):
             generated_at=datetime.now(timezone.utc),
         )
         memo = _build_memo(self._pack, nodes)
-        return FinalOutput(thesis=thesis, memo_md=memo, diagram_mmd=self._pack.diagram_mmd)
+        return FinalOutput(
+            thesis=thesis, memo_md=memo, diagram_mmd=self._pack.diagram_mmd, answers=answers
+        )
+
+
+# --- Rule-based Synthesizer answers (demo and offline replay) ---------------
+
+_CRIT_LINE = re.compile(
+    r"^- (\S+) \[(weak|mixed|strong)\] (.+?) / "
+    r"(bottleneck_vs_commodity|substitution_risk|priced_in|visitor): (.*)$",
+    re.MULTILINE,
+)
+_ANGLE_LABEL = {
+    "bottleneck_vs_commodity": "pricing power may not last once rivals qualify",
+    "substitution_risk": "a substitute could displace it within the horizon",
+    "priced_in": "the bull case may already be in the price",
+}
+
+
+def parse_critique_block(text: str) -> list[Critique]:
+    """Read critiques back from the Synthesizer's skeptic block (demo only)."""
+    out: list[Critique] = []
+    for cid, verdict, node, angle, arg in _CRIT_LINE.findall(text):
+        out.append(
+            Critique(
+                id=cid, node_name=node, angle=angle, verdict=verdict,  # type: ignore[arg-type]
+                argument=arg.split("  (suggest:")[0].strip(),
+            )
+        )
+    return out
+
+
+def rule_based_answers(
+    base_nodes: list[Node], critiques: list[Critique], fault: bool = False
+) -> tuple[list[Node], list[CritiqueAnswer]]:
+    """Deterministic Synthesizer stand-in that honors the protocol.
+
+    weak -> conceded (confidence lowered by 0.1, risk added); mixed -> partial;
+    strong -> held; visitor -> conceded (risk added). With ``fault``, the first
+    weak critique is answered "conceded, confidence lowered" without changing
+    the node, which the protocol checker must refuse.
+    """
+    nodes = {n.name: n.model_copy(deep=True) for n in base_nodes}
+    answers: list[CritiqueAnswer] = []
+    faulted = False
+    for c in critiques:
+        n = nodes.get(c.node_name)
+        if n is None:
+            answers.append(CritiqueAnswer(
+                critique_id=c.id, stance="conceded", changes=["dropped"],
+                rebuttal=f"Conceded. {c.node_name} is no longer in the tree."))
+            continue
+        if c.angle == "visitor":
+            risk = f"Visitor challenge: {c.argument.strip()[:140]}"
+            if risk not in n.risks:
+                n.risks.append(risk)
+            answers.append(CritiqueAnswer(
+                critique_id=c.id, stance="conceded", changes=["risk_added"],
+                rebuttal="Conceded in part. The challenge is now listed as a key risk on this node; "
+                "confidence is unchanged because the cited evidence still supports the position."))
+        elif c.verdict == "weak":
+            if fault and not faulted:
+                faulted = True
+                answers.append(CritiqueAnswer(
+                    critique_id=c.id, stance="conceded", changes=["confidence_lowered"],
+                    rebuttal="Conceded. Confidence lowered."))
+                continue
+            before = n.confidence
+            n.confidence = round(max(0.05, n.confidence - 0.1), 2)
+            risk = f"Skeptic: {_ANGLE_LABEL.get(c.angle, c.angle)}"
+            if risk not in n.risks:
+                n.risks.append(risk)
+            answers.append(CritiqueAnswer(
+                critique_id=c.id, stance="conceded", changes=["confidence_lowered", "risk_added"],
+                rebuttal=f"Conceded. Confidence lowered from {before:.2f} to {n.confidence:.2f} "
+                "and the failure mode added as a risk."))
+        elif c.verdict == "mixed":
+            answers.append(CritiqueAnswer(
+                critique_id=c.id, stance="partial",
+                rebuttal="Partly conceded. The concern is bounded and carried into the memo's "
+                "'What we'd have to be wrong about' section."))
+        else:
+            answers.append(CritiqueAnswer(
+                critique_id=c.id, stance="held",
+                rebuttal="Held. The cited evidence still supports the node under this angle."))
+    kept = [nodes[n.name] for n in base_nodes if n.name in nodes]
+    return kept, answers
 
 
 # --- helpers ----------------------------------------------------------------
@@ -833,7 +930,8 @@ def offline_fetch() -> Iterator[None]:
 
 
 def run_demo(theme: str, trace: TraceWriter | None = None, cache_dir: str = ".diskcache_demo",
-             seed: int | None = None, console: Any = None) -> dict[str, Any]:
+             seed: int | None = None, console: Any = None, *, skip_skeptic: bool = False,
+             fault_once: bool = False, on_protocol: Any = None) -> dict[str, Any]:
     """Run the real LangGraph pipeline with stubbed LLM + search. No keys, no network."""
     from .graph import build_graph
     from .tools import CacheBundle
@@ -841,9 +939,10 @@ def run_demo(theme: str, trace: TraceWriter | None = None, cache_dir: str = ".di
     if seed is not None:
         random.seed(seed)
     trace = trace or TraceWriter()
-    llm = DemoLLM(theme=theme, trace=trace)
+    llm = DemoLLM(theme=theme, trace=trace, fault_once=fault_once)
     search = DemoSearch(theme=theme, trace=trace)
     cache = CacheBundle(cache_dir)
     with offline_fetch():
-        graph = build_graph(llm=llm, search=search, cache=cache, console=console)
+        graph = build_graph(llm=llm, search=search, cache=cache, console=console,
+                            skip_skeptic=skip_skeptic, on_protocol=on_protocol)
         return graph.invoke({"theme": theme})

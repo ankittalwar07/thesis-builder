@@ -62,7 +62,8 @@ Read these files before starting; they are the contract you follow:
 | File | What you take from it |
 |---|---|
 | `routines/themes.yaml` | The themes to research and their golden specs |
-| `src/thesis_builder/prompts.py` | The exact agent prompts (`*_SYSTEM_V1`, `*_USER_V1`) |
+| `src/thesis_builder/prompts.py` | The exact agent prompts (`*_SYSTEM_V1`, `*_USER_V1`; the Synthesizer uses `SYNTHESIZER_SYSTEM_V2`) |
+| `src/thesis_builder/protocol.py` | The obligated-rebuttal rules (R1 to R4) the validator enforces |
 | `src/thesis_builder/schemas.py` | `SourceSummary`, `Node`, `Critique`, `Thesis`, `JudgeScores` |
 | `src/thesis_builder/publish.py` | `PublishedThesis`, the JSON shape the UI reads |
 | `src/thesis_builder/agents/skeptic.py` | `_evidence_for_node`: how evidence packs are picked |
@@ -106,7 +107,8 @@ replaced by `_` (for example `AI infrastructure` becomes `ai_infrastructure`).
 ## 2. Skeptic (per theme): three angles, in parallel
 
 Follow `SKEPTIC_SYSTEM_V1` / `SKEPTIC_USER_V1`. For **every** draft node, write
-one `Critique` for **each** of the three angles:
+one `Critique` for **each** of the three angles, and give every critique a
+unique `id` (`C1`, `C2`, ... in order):
 
 - `bottleneck_vs_commodity`: true chokepoint with pricing power, or commoditizing?
 - `substitution_risk`: what could displace it in 3 to 7 years?
@@ -126,8 +128,8 @@ non-overlapping `headline_concerns` per `SKEPTIC_ROLLUP_SYSTEM_V1`.
 
 ## 3. Synthesizer (per theme)
 
-Follow `SYNTHESIZER_SYSTEM_V1` to produce the `Thesis`, `memo_md` and
-`diagram_mmd`, with these overrides:
+Follow `SYNTHESIZER_SYSTEM_V2` to produce the `Thesis`, `memo_md`,
+`diagram_mmd` and one answer per critique, with these overrides:
 
 - Investable picks: at most 5, formatted `TICKER: one-sentence why` (a colon, not
   a dash), mixed across layers.
@@ -137,15 +139,21 @@ Follow `SYNTHESIZER_SYSTEM_V1` to produce the `Thesis`, `memo_md` and
 - `skeptic_notes` = the headline concerns, verbatim.
 - `diagram_mmd` starts with `graph LR`, four `subgraph` blocks (one per layer),
   labels `name<br/>up to 3 tickers`, edges from raw inputs to applications.
-- **Rebuttals:** for every critique, add `stance` and `rebuttal`:
-  - `held`: the bull case survives; say why in one or two sentences.
+- **Rebuttals (obligated, checked by the validator):** answer every critique id
+  exactly once with `stance`, `rebuttal` and `changes`:
+  - `held`: the bull case survives; say why in one or two sentences. `changes`
+    is empty and the node stays in the tree.
   - `partial`: the concern is real but bounded; say where the memo carries it.
-  - `conceded`: say exactly what changed (confidence from X to Y, risk added, node
-    dropped).
+    The node stays in the tree.
+  - `conceded`: list every change you made in `changes`, using only
+    `confidence_lowered` (final confidence below the draft's),
+    `risk_added` (a new entry in the node's `risks`) or `dropped` (the node is
+    not in the final tree), and say exactly what changed in the rebuttal.
 
-  The rebuttal must match what you actually did to the tree.
-  Critiques must name a node that is in the final tree. If you dropped a node,
-  re-point its critiques to the node that absorbed it or leave them out.
+  Every claimed change must be real in the diff between the draft tree and the
+  final tree, and every real change you made because of a critique should be
+  claimed. Critiques keep naming the **draft** node they attacked, even if you
+  dropped it; never re-point or leave out a critique.
 
 ## 4. Publish (per theme)
 
@@ -165,9 +173,11 @@ Write `docs/data/themes/<slug>.json` matching `PublishedThesis` in
               "generated_at": "<ISO 8601 UTC timestamp>" },
   "memo_md": "# <theme>: Value Chain Thesis ...",
   "diagram_mmd": "graph LR ...",
-  "critiques": [ { "node_name": "...", "angle": "priced_in", "verdict": "mixed",
-                   "argument": "...", "suggested_change": "...",
-                   "stance": "partial", "rebuttal": "..." } ],
+  "draft_nodes": [ ...the Researcher's draft Node list, unchanged... ],
+  "protocol": { "passed": true, "attempts": 1, "refused": [], "warnings": [] },
+  "critiques": [ { "id": "C1", "node_name": "...", "angle": "priced_in",
+                   "verdict": "mixed", "argument": "...", "suggested_change": "...",
+                   "stance": "partial", "rebuttal": "...", "changes": [] } ],
   "headline_concerns": [ "..." ],
   "research": { "queries_run": 0, "unique_urls": 0, "summaries": 0,
                 "search_queries": [ "..." ] },

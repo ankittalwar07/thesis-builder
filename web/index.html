@@ -27,6 +27,9 @@
         autocomplete="off"
       />
       <button id="run-btn">Build thesis</button>
+      <label class="toggle" id="refusal-toggle" title="Demo mode: the first Synthesizer attempt claims a concession it did not make, so you can watch the checker refuse it.">
+        <input type="checkbox" id="show-refusal" /> show a refused answer
+      </label>
       <div class="presets">
         <span>presets:</span>
         <button class="preset" data-theme="AI infrastructure">AI infrastructure</button>
@@ -66,9 +69,12 @@
       <div><div class="m-label">critiques</div><div class="m-val" id="m-critiques">0</div></div>
     </section>
 
+    <section class="protocol-banner" id="protocol-banner" hidden></section>
+
     <section class="results" id="results">
       <nav class="tabs">
         <button class="tab active" data-tab="tree">Tree</button>
+        <button class="tab" data-tab="critiques">Critiques and answers</button>
         <button class="tab" data-tab="memo">Memo</button>
         <button class="tab" data-tab="diagram">Diagram</button>
         <button class="tab" data-tab="picks">Picks</button>
@@ -78,6 +84,9 @@
 
       <div class="tab-panel active" id="tab-tree">
         <div class="placeholder">Run a theme to see the value-chain tree.</div>
+      </div>
+      <div class="tab-panel" id="tab-critiques">
+        <div class="placeholder">Every critique appears here beside the Synthesizer's answer.</div>
       </div>
       <div class="tab-panel" id="tab-memo">
         <div class="placeholder">Memo will render here after the synthesizer completes.</div>
@@ -96,6 +105,18 @@
       </div>
     </section>
   </main>
+
+  <dialog id="challenge-dialog">
+    <form method="dialog" id="challenge-form">
+      <h3>Challenge <span id="challenge-node"></span></h3>
+      <p class="hint">Your challenge becomes one more critique. The Synthesizer must answer it on the record, and any change it claims must show up in the tree.</p>
+      <textarea id="challenge-text" rows="3" maxlength="400" placeholder='e.g. "This is already priced in."' required></textarea>
+      <div class="dialog-actions">
+        <button value="cancel" formnovalidate>Cancel</button>
+        <button value="send" id="challenge-send">Send challenge</button>
+      </div>
+    </form>
+  </dialog>
 
   <footer>
     <span>

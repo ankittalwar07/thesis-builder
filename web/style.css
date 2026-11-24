@@ -160,3 +160,26 @@ footer { color: var(--muted); font-size: 12px; padding: 14px 24px; border-top: 1
   .pipeline { flex-direction: column; }
   .arrow { display: none; }
 }
+
+/* --- obligated rebuttal --------------------------------------------------- */
+.toggle { font-size: 13px; color: #555; display: inline-flex; gap: 6px; align-items: center; }
+.protocol-banner { margin: 12px 0; padding: 10px 14px; border-radius: 8px; font-size: 14px; }
+.protocol-banner.ok { background: #e8f6ec; border: 1px solid #9fd5ad; }
+.protocol-banner.refused { background: #fdecea; border: 1px solid #f1a9a0; }
+.protocol-banner.pending { background: #fff7e0; border: 1px solid #f0d58a; }
+.protocol-banner ul { margin: 6px 0 0 18px; padding: 0; }
+.mode-badge.replay { background: #6b4fbb; color: #fff; }
+.crit-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 10px 0; border-bottom: 1px solid #eee; }
+.crit-row.visitor { background: #f5f0ff; }
+.crit-side { font-size: 14px; }
+.crit-meta { font-size: 12px; color: #666; margin-bottom: 4px; }
+.stance { font-weight: 600; text-transform: uppercase; font-size: 11px; padding: 1px 6px; border-radius: 4px; }
+.stance.held { background: #e3eefc; }
+.stance.partial { background: #fff1cc; }
+.stance.conceded { background: #fde2dc; }
+.change { font-size: 11px; background: #eee; border-radius: 4px; padding: 1px 5px; margin-left: 4px; }
+.challenge-btn { margin-top: 6px; font-size: 12px; }
+#challenge-dialog { max-width: 520px; width: 90%; border-radius: 10px; border: 1px solid #ccc; }
+#challenge-text { width: 100%; box-sizing: border-box; font: inherit; }
+.dialog-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 10px; }
+@media (max-width: 700px) { .crit-row { grid-template-columns: 1fr; } }
